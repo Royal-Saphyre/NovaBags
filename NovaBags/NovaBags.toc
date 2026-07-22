@@ -1,8 +1,9 @@
 ## Interface: 30300
 ## Title: NovaBags
 ## Author: Royal-Saphyre
-## Version: 0.1.1
+## Version: 0.1.2
 ## Notes: A modern bag addon for WoW 3.3.5a
 
 NovaBags.lua
 Core.lua
+BagScanner.lua
