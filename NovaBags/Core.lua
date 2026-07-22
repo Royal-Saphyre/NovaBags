@@ -69,3 +69,48 @@ SlashCmdList["NOVA"] = function()
     end
 
 end
+
+function NovaDisplayItems()
+
+    NovaScanBags()
+
+
+    for i, item in ipairs(NovaInventory) do
+
+        local button = NovaItemButtons[i]
+
+
+        if not button then
+
+            button = NovaCreateItemButton(
+                NovaFrame,
+                i
+            )
+
+        end
+
+
+        button:SetPoint(
+            "TOPLEFT",
+            30 + ((i-1)%10)*45,
+            -60 - math.floor((i-1)/10)*45
+        )
+
+
+        local _, _, _, _, _, _, _, _, _, icon =
+            GetItemInfo(item.link)
+
+
+        button.icon:SetTexture(icon)
+
+        button.count:SetText(
+            item.count
+        )
+
+        button.link = item.link
+
+        button:Show()
+
+    end
+
+end
