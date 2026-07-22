@@ -66,6 +66,7 @@ SlashCmdList["NOVA"] = function()
         NovaFrame:Hide()
     else
         NovaFrame:Show()
+        NovaDisplayItems()
     end
 
 end
