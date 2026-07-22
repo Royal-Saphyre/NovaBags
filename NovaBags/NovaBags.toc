@@ -7,3 +7,4 @@
 NovaBags.lua
 Core.lua
 BagScanner.lua
+UI/ItemButton.lua
