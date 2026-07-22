@@ -8,7 +8,7 @@
 if not NovaItemButtons then
     NovaItemButtons = {}
 end
-
+print("|cff00ff00Nova ItemButton loaded!|r")
 
 function NovaCreateItemButton(parent, index)
 
