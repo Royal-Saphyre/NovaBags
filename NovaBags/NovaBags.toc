@@ -5,6 +5,6 @@
 ## Notes: A modern bag addon for WoW 3.3.5a
 
 NovaBags.lua
-Core.lua
 BagScanner.lua
 UI/ItemButton.lua
+Core.lua
