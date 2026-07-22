@@ -5,7 +5,9 @@
 -- Creates item buttons
 --=============================================================================
 
-NovaItemButtons = {}
+if not NovaItemButtons then
+    NovaItemButtons = {}
+end
 
 
 function NovaCreateItemButton(parent, index)
