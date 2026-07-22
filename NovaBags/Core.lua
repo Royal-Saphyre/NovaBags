@@ -22,14 +22,17 @@ NovaFrame:SetBackdrop({
     }
 })
 
+
 NovaFrame:SetMovable(true)
 NovaFrame:EnableMouse(true)
 
 NovaFrame:RegisterForDrag("LeftButton")
 
+
 NovaFrame:SetScript("OnDragStart", function(self)
     self:StartMoving()
 end)
+
 
 NovaFrame:SetScript("OnDragStop", function(self)
     self:StopMovingOrSizing()
@@ -37,6 +40,7 @@ end)
 
 
 NovaFrame:Hide()
+
 
 
 -- Close button
@@ -50,33 +54,27 @@ local close = CreateFrame(
 
 close:SetPoint("TOPRIGHT", -5, -5)
 
+
 close:SetScript("OnClick", function()
     NovaFrame:Hide()
 end)
 
 
 
--- Slash command
-
-SLASH_NOVA1 = "/nova"
-
-SlashCmdList["NOVA"] = function()
-
-    if NovaFrame:IsShown() then
-        NovaFrame:Hide()
-    else
-        NovaFrame:Show()
-        NovaDisplayItems()
-    end
-
-end
+---------------------------------------------------
+-- Display Items
+---------------------------------------------------
 
 function NovaDisplayItems()
 
     NovaScanBags()
 
 
+    print("|cffd4af37Nova|r displaying "..#NovaInventory.." items")
+
+
     for i, item in ipairs(NovaInventory) do
+
 
         local button = NovaItemButtons[i]
 
@@ -91,6 +89,7 @@ function NovaDisplayItems()
         end
 
 
+
         button:SetPoint(
             "TOPLEFT",
             30 + ((i-1)%10)*45,
@@ -98,20 +97,54 @@ function NovaDisplayItems()
         )
 
 
+
         local _, _, _, _, _, _, _, _, _, icon =
             GetItemInfo(item.link)
 
 
+
         button.icon:SetTexture(icon)
+
 
         button.count:SetText(
             item.count
         )
 
+
         button.link = item.link
+
 
         button:Show()
 
+
     end
+
+end
+
+
+
+---------------------------------------------------
+-- Slash Command
+---------------------------------------------------
+
+SLASH_NOVA1 = "/nova"
+
+
+SlashCmdList["NOVA"] = function()
+
+
+    if NovaFrame:IsShown() then
+
+        NovaFrame:Hide()
+
+
+    else
+
+        NovaFrame:Show()
+
+        NovaDisplayItems()
+
+    end
+
 
 end
