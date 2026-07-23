@@ -34,7 +34,7 @@ NovaFrame:SetScript("OnDragStop", function(self) self:StopMovingOrSizing() end)
 NovaFrame:Hide()
 
 ------------------------------------------------
--- Header & Title
+-- Header & Title (Shifted Higher)
 ------------------------------------------------
 
 local header = NovaFrame:CreateTexture(nil, "ARTWORK")
@@ -43,10 +43,12 @@ header:SetSize(260, 50)
 header:SetPoint("TOP", 0, 10)
 NovaHeader = header
 
+-- Title moved higher (-10 instead of -18) to sit right in the header center
 local title = NovaFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-title:SetPoint("TOP", header, "TOP", 10, -18)
+title:SetPoint("TOP", header, "TOP", 10, -10)
 title:SetText("NovaBags")
 
+-- Icon aligned with higher title
 local logo = NovaFrame:CreateTexture(nil, "OVERLAY")
 logo:SetTexture("Interface\\Icons\\Ability_Druid_Starfall")
 logo:SetSize(20, 20)
@@ -187,7 +189,7 @@ function NovaDisplayItems()
 end
 
 ------------------------------------------------
--- Dynamic Physical Sorting Algorithm
+-- Real Physical Bag Sorting Engine (With Forward Packing)
 ------------------------------------------------
 
 local isSorting = false
@@ -198,7 +200,7 @@ function NovaSortBagsPhysical()
 
     NovaScanBags()
 
-    -- Map out ideal target order
+    -- 1. Build sorted target list (putting all valid items first, empty slots last)
     local targetOrder = {}
     for i, item in ipairs(NovaInventory) do
         table.insert(targetOrder, item)
@@ -223,15 +225,20 @@ function NovaSortBagsPhysical()
         return (a.link or "") < (b.link or "")
     end)
 
-    -- Dynamic physical pass
+    -- 2. Track physical bag state
     local currentLayout = {}
     for i, item in ipairs(NovaInventory) do
-        currentLayout[i] = { bagID = item.bagID, slotID = item.slotID, link = item.link, hasItem = item.hasItem }
+        currentLayout[i] = {
+            bagID = item.bagID,
+            slotID = item.slotID,
+            link = item.link,
+            hasItem = item.hasItem
+        }
     end
 
+    -- 3. Execute physical moves ensuring items move forward into early empty slots
     for targetIndex, targetItem in ipairs(targetOrder) do
         if targetItem.hasItem then
-            -- Find where targetItem currently lives in currentLayout
             local currentPos = nil
             for idx, liveItem in ipairs(currentLayout) do
                 if liveItem.bagID == targetItem.bagID and liveItem.slotID == targetItem.slotID then
@@ -240,16 +247,14 @@ function NovaSortBagsPhysical()
                 end
             end
 
-            -- If it's not already in the correct physical slot index
             if currentPos and currentPos ~= targetIndex then
                 local destSlot = currentLayout[targetIndex]
                 local srcSlot = currentLayout[currentPos]
 
-                -- Execute physical WoW swap
                 PickupContainerItem(srcSlot.bagID, srcSlot.slotID)
                 PickupContainerItem(destSlot.bagID, destSlot.slotID)
 
-                -- Swap tracking locations internally
+                -- Swap state pointers
                 currentLayout[targetIndex], currentLayout[currentPos] = currentLayout[currentPos], currentLayout[targetIndex]
             end
         end
