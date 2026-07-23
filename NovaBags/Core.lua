@@ -6,7 +6,69 @@
 --=============================================================================
 
 NovaFrame = CreateFrame("Frame", "NovaMainFrame", UIParent)
+---------------------------------------------------
+-- Nova Header / Logo
+---------------------------------------------------
 
+local header = CreateFrame(
+    "Frame",
+    nil,
+    NovaFrame
+)
+
+header:SetSize(600, 70)
+header:SetPoint(
+    "TOP",
+    NovaFrame,
+    "TOP",
+    0,
+    0
+)
+
+
+-- Starburst logo
+
+local logo = header:CreateTexture(
+    nil,
+    "ARTWORK"
+)
+
+logo:SetSize(55, 55)
+logo:SetPoint(
+    "LEFT",
+    25,
+    0
+)
+
+logo:SetTexture(
+    "Interface\\Icons\\Spell_Shadow_Twilight"
+)
+
+
+-- Nova title
+
+local title = header:CreateFontString(
+    nil,
+    "OVERLAY"
+)
+
+title:SetFont(
+    "Fonts\\FRIZQT__.TTF",
+    28,
+    "OUTLINE"
+)
+
+title:SetPoint(
+    "LEFT",
+    logo,
+    "RIGHT",
+    15,
+    0
+)
+
+title:SetText(
+    "|cff00ccffNova|rBags"
+)
 NovaFrame:SetSize(600, 450)
 NovaFrame:SetPoint("CENTER")
 
