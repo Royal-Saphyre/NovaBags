@@ -6,9 +6,6 @@
 local SPACING = 36
 local COLUMNS = 9
 
--- Sorting mode state
-NovaIsSorted = false
-
 ------------------------------------------------
 -- Main Frame
 ------------------------------------------------
@@ -37,7 +34,7 @@ NovaFrame:SetScript("OnDragStop", function(self) self:StopMovingOrSizing() end)
 NovaFrame:Hide()
 
 ------------------------------------------------
--- Header & Title (Adjusted Higher)
+-- Header & Title (Fixed Position Inside Banner)
 ------------------------------------------------
 
 local header = NovaFrame:CreateTexture(nil, "ARTWORK")
@@ -46,12 +43,10 @@ header:SetSize(260, 50)
 header:SetPoint("TOP", 0, 10)
 NovaHeader = header
 
--- Title moved slightly higher (+12 offset) to sit cleanly on banner
 local title = NovaFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-title:SetPoint("TOP", header, "TOP", 10, -12)
+title:SetPoint("TOP", header, "TOP", 10, -18)
 title:SetText("NovaBags")
 
--- Icon raised alongside title
 local logo = NovaFrame:CreateTexture(nil, "OVERLAY")
 logo:SetTexture("Interface\\Icons\\Ability_Druid_Starfall")
 logo:SetSize(20, 20)
@@ -154,39 +149,11 @@ function NovaCreateSlots(amount)
 end
 
 ------------------------------------------------
--- Display & Sort Logic
+-- Display Items
 ------------------------------------------------
 
-function NovaDisplayItems(sorted)
-    if sorted ~= nil then
-        NovaIsSorted = sorted
-    end
-
+function NovaDisplayItems()
     NovaScanBags()
-
-    if NovaIsSorted then
-        table.sort(NovaInventory, function(a, b)
-            if a.hasItem ~= b.hasItem then
-                return a.hasItem and not b.hasItem
-            end
-
-            if not a.hasItem and not b.hasItem then
-                return false
-            end
-
-            local _, _, qA = GetItemInfo(a.link or "")
-            local _, _, qB = GetItemInfo(b.link or "")
-
-            qA = qA or -1
-            qB = qB or -1
-
-            if qA ~= qB then
-                return qA > qB
-            end
-
-            return (a.link or "") < (b.link or "")
-        end)
-    end
 
     local count = #NovaInventory
     NovaCreateSlots(count)
@@ -220,6 +187,60 @@ function NovaDisplayItems(sorted)
 end
 
 ------------------------------------------------
+-- Real Physical Bag Sorting Engine
+------------------------------------------------
+
+local isSorting = false
+
+function NovaSortBagsPhysical()
+    if isSorting or CursorHasItem() then return end
+    isSorting = true
+
+    NovaScanBags()
+
+    -- Map out ideal target positions
+    local sortedList = {}
+    for i, item in ipairs(NovaInventory) do
+        table.insert(sortedList, item)
+    end
+
+    table.sort(sortedList, function(a, b)
+        if a.hasItem ~= b.hasItem then
+            return a.hasItem and not b.hasItem
+        end
+        if not a.hasItem and not b.hasItem then
+            return false
+        end
+
+        local _, _, qA = GetItemInfo(a.link or "")
+        local _, _, qB = GetItemInfo(b.link or "")
+        qA = qA or -1
+        qB = qB or -1
+
+        if qA ~= qB then
+            return qA > qB
+        end
+        return (a.link or "") < (b.link or "")
+    end)
+
+    -- Move items sequentially to physical target slots
+    local moves = 0
+    for i, targetItem in ipairs(sortedList) do
+        local currentSlot = NovaInventory[i]
+        if targetItem.hasItem and (targetItem.bagID ~= currentSlot.bagID or targetItem.slotID ~= currentSlot.slotID) then
+            PickupContainerItem(targetItem.bagID, targetItem.slotID)
+            PickupContainerItem(currentSlot.bagID, currentSlot.slotID)
+            moves = moves + 1
+
+            if moves > 8 then break end -- Process in chunks to prevent server throttle
+        end
+    end
+
+    isSorting = false
+    NovaDisplayItems()
+end
+
+------------------------------------------------
 -- Footer Action Buttons
 ------------------------------------------------
 
@@ -227,13 +248,13 @@ local scan = CreateFrame("Button", nil, NovaFrame, "UIPanelButtonTemplate")
 scan:SetSize(50, 20)
 scan:SetPoint("BOTTOMRIGHT", -15, 12)
 scan:SetText("Scan")
-scan:SetScript("OnClick", function() NovaDisplayItems(false) end)
+scan:SetScript("OnClick", function() NovaDisplayItems() end)
 
 local sortBtn = CreateFrame("Button", nil, NovaFrame, "UIPanelButtonTemplate")
 sortBtn:SetSize(50, 20)
 sortBtn:SetPoint("RIGHT", scan, "LEFT", -4, 0)
 sortBtn:SetText("Sort")
-sortBtn:SetScript("OnClick", function() NovaDisplayItems(true) end)
+sortBtn:SetScript("OnClick", function() NovaSortBagsPhysical() end)
 
 ------------------------------------------------
 -- Slash Command
@@ -245,6 +266,6 @@ SlashCmdList["NOVA"] = function()
         NovaFrame:Hide()
     else
         NovaFrame:Show()
-        NovaDisplayItems(NovaIsSorted)
+        NovaDisplayItems()
     end
 end
