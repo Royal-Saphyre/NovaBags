@@ -91,12 +91,71 @@ fadeIn:SetOrder(2)
 animGroup:Play()
 
 ------------------------------------------------
--- Money Display Frame
+-- Themes (Bottom Left)
+------------------------------------------------
+
+local EMBLEM_LION    = "Interface\\MainMenuBar\\UI-MainMenuBar-EndCap-Human"
+local EMBLEM_DRAGON  = "Interface\\MainMenuBar\\UI-MainMenuBar-EndCap-Dwarf"
+local EMBLEM_DWARF   = "Interface\\FrameXML\\UI-Frame-Dwarf-Corner"
+local EMBLEM_ELF     = "Interface\\FrameXML\\UI-Frame-NightElf-Corner"
+local EMBLEM_WING    = "Interface\\TutorialFrame\\UI-TutorialFrame-LevelUp"
+
+NovaThemes = {
+    Default      = { 0.10, 0.10, 0.10, 0.70, 0.70, 0.70, "Interface\\Icons\\INV_Misc_QuestionMark", EMBLEM_LION },
+    ObsidianGold = { 0.02, 0.02, 0.02, 0.85, 0.65, 0.15, "Interface\\Icons\\INV_Ingot_05",           EMBLEM_DRAGON },
+    Shadow       = { 0.04, 0.03, 0.06, 0.50, 0.20, 0.80, "Interface\\Icons\\Spell_Shadow_Shadesofdark", EMBLEM_ELF },
+    Arcane       = { 0.08, 0.02, 0.15, 0.50, 0.30, 1.00, "Interface\\Icons\\Spell_Arcane_Arcane01",     EMBLEM_DWARF },
+    Starfire     = { 0.02, 0.08, 0.18, 0.20, 0.60, 1.00, "Interface\\Icons\\Spell_Arcane_StarFire",     EMBLEM_WING }
+}
+
+NovaCurrentTheme = "ObsidianGold"
+
+local themeLabel = NovaFrame:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+themeLabel:SetPoint("BOTTOMLEFT", 15, 14)
+themeLabel:SetText("Themes:")
+
+local themeOrder = { "Default", "ObsidianGold", "Shadow", "Arcane", "Starfire" }
+
+for i, name in ipairs(themeOrder) do
+    local b = CreateFrame("Button", nil, NovaFrame)
+    b:SetSize(16, 16)
+    b:SetPoint("BOTTOMLEFT", 60 + ((i - 1) * 20), 12)
+    b:SetNormalTexture(NovaThemes[name][7])
+    b:SetScript("OnClick", function() NovaApplyTheme(name) end)
+end
+
+function NovaApplyTheme(name)
+    local t = NovaThemes[name]
+    if not t then return end
+
+    NovaCurrentTheme = name
+
+    NovaFrame:SetBackdropColor(t[1], t[2], t[3], 0.95)
+    NovaFrame:SetBackdropBorderColor(t[4], t[5], t[6], 1)
+    NovaHeader:SetVertexColor(t[4], t[5], t[6], 1)
+
+    leftCorner:SetTexture(t[8])
+    rightCorner:SetTexture(t[8])
+
+    leftCorner:SetVertexColor(t[4], t[5], t[6], 1)
+    rightCorner:SetVertexColor(t[4], t[5], t[6], 1)
+
+    if NovaSlots then
+        for _, btn in ipairs(NovaSlots) do
+            if btn and btn.bg then
+                btn.bg:SetVertexColor(t[4], t[5], t[6], 0.8)
+            end
+        end
+    end
+end
+
+------------------------------------------------
+-- Money Display Frame (Positioned Right of Themes)
 ------------------------------------------------
 
 local moneyFrame = CreateFrame("Frame", "NovaMoneyFrame", NovaFrame)
-moneyFrame:SetSize(160, 20)
-moneyFrame:SetPoint("BOTTOMLEFT", 15, 12)
+moneyFrame:SetSize(110, 20)
+moneyFrame:SetPoint("BOTTOMLEFT", 170, 12)
 
 local moneyText = moneyFrame:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
 moneyText:SetPoint("LEFT", moneyFrame, "LEFT", 0, 0)
@@ -107,12 +166,17 @@ function NovaUpdateMoney()
     local silver = math.floor((totalCopper % 10000) / 100)
     local copper = totalCopper % 100
 
-    local formatted = string.format("%dg %ds %dc", gold, silver, copper)
-    formatted = string.gsub(formatted, "g", "|cffffd700g|r")
-    formatted = string.gsub(formatted, "s", "|cffc7c7c1s|r")
-    formatted = string.gsub(formatted, "c", "|cffdda0ddc|r")
+    -- Correct WoW color formatting strings
+    local str = ""
+    if gold > 0 then
+        str = str .. gold .. "|cffffd700g|r "
+    end
+    if silver > 0 or gold > 0 then
+        str = str .. silver .. "|cffc7c7c1s|r "
+    end
+    str = str .. copper .. "|cffdda0ddc|r"
 
-    moneyText:SetText(formatted)
+    moneyText:SetText(str)
 end
 
 local moneyEvents = CreateFrame("Frame")
@@ -128,7 +192,7 @@ end)
 
 local scrollFrame = CreateFrame("ScrollFrame", "NovaBagScrollFrame", NovaFrame, "UIPanelScrollFrameTemplate")
 scrollFrame:SetPoint("TOPLEFT", NovaFrame, "TOPLEFT", 15, -45)
-scrollFrame:SetPoint("BOTTOMRIGHT", NovaFrame, "BOTTOMRIGHT", -35, 60)
+scrollFrame:SetPoint("BOTTOMRIGHT", NovaFrame, "BOTTOMRIGHT", -35, 45)
 
 local scrollChild = CreateFrame("Frame", "NovaBagScrollChild", scrollFrame)
 scrollChild:SetSize(320, 1)
@@ -170,61 +234,6 @@ function NovaCreateSlots(amount)
 
     local totalRows = math.ceil(amount / COLUMNS)
     scrollChild:SetHeight(math.max(totalRows * SPACING, 10))
-end
-
-------------------------------------------------
--- Themes & Dynamic Slot Tinting
-------------------------------------------------
-
-local EMBLEM_LION    = "Interface\\MainMenuBar\\UI-MainMenuBar-EndCap-Human"
-local EMBLEM_DRAGON  = "Interface\\MainMenuBar\\UI-MainMenuBar-EndCap-Dwarf"
-local EMBLEM_DWARF   = "Interface\\FrameXML\\UI-Frame-Dwarf-Corner"
-local EMBLEM_ELF     = "Interface\\FrameXML\\UI-Frame-NightElf-Corner"
-local EMBLEM_WING    = "Interface\\TutorialFrame\\UI-TutorialFrame-LevelUp"
-
-NovaThemes = {
-    Default      = { 0.10, 0.10, 0.10, 0.70, 0.70, 0.70, "Interface\\Icons\\INV_Misc_QuestionMark", EMBLEM_LION },
-    ObsidianGold = { 0.02, 0.02, 0.02, 0.85, 0.65, 0.15, "Interface\\Icons\\INV_Ingot_05",           EMBLEM_DRAGON },
-    Shadow       = { 0.04, 0.03, 0.06, 0.50, 0.20, 0.80, "Interface\\Icons\\Spell_Shadow_Shadesofdark", EMBLEM_ELF },
-    Arcane       = { 0.08, 0.02, 0.15, 0.50, 0.30, 1.00, "Interface\\Icons\\Spell_Arcane_Arcane01",     EMBLEM_DWARF },
-    Starfire     = { 0.02, 0.08, 0.18, 0.20, 0.60, 1.00, "Interface\\Icons\\Spell_Arcane_StarFire",     EMBLEM_WING }
-}
-
-NovaCurrentTheme = "ObsidianGold"
-
-function NovaApplyTheme(name)
-    local t = NovaThemes[name]
-    if not t then return end
-
-    NovaCurrentTheme = name
-
-    NovaFrame:SetBackdropColor(t[1], t[2], t[3], 0.95)
-    NovaFrame:SetBackdropBorderColor(t[4], t[5], t[6], 1)
-    NovaHeader:SetVertexColor(t[4], t[5], t[6], 1)
-
-    leftCorner:SetTexture(t[8])
-    rightCorner:SetTexture(t[8])
-
-    leftCorner:SetVertexColor(t[4], t[5], t[6], 1)
-    rightCorner:SetVertexColor(t[4], t[5], t[6], 1)
-
-    if NovaSlots then
-        for _, btn in ipairs(NovaSlots) do
-            if btn and btn.bg then
-                btn.bg:SetVertexColor(t[4], t[5], t[6], 0.8)
-            end
-        end
-    end
-end
-
-local themeOrder = { "Default", "ObsidianGold", "Shadow", "Arcane", "Starfire" }
-
-for i, name in ipairs(themeOrder) do
-    local b = CreateFrame("Button", nil, NovaFrame)
-    b:SetSize(16, 16)
-    b:SetPoint("BOTTOMRIGHT", -120 + ((i - 1) * 20), 14)
-    b:SetNormalTexture(NovaThemes[name][7])
-    b:SetScript("OnClick", function() NovaApplyTheme(name) end)
 end
 
 ------------------------------------------------
