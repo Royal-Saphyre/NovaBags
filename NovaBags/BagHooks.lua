@@ -1,7 +1,6 @@
 --=============================================================================
 -- NovaBags
 -- File: BagHooks.lua
--- Safely suppresses Blizzard default containers and handles toggling
 --=============================================================================
 
 local function ToggleNova()
@@ -9,11 +8,10 @@ local function ToggleNova()
         NovaFrame:Hide()
     else
         NovaFrame:Show()
-        NovaDisplayItems()
+        NovaDisplayItems(false)
     end
 end
 
--- Suppress default containers and cleanly toggle NovaBags on/off
 local hookFrame = CreateFrame("Frame")
 hookFrame:RegisterEvent("PLAYER_LOGIN")
 hookFrame:SetScript("OnEvent", function()
@@ -22,14 +20,12 @@ hookFrame:SetScript("OnEvent", function()
         if frame then
             frame:HookScript("OnShow", function(self)
                 self:Hide()
-                -- Toggles closed if open, otherwise opens and refreshes
                 ToggleNova()
             end)
         end
     end
 end)
 
--- Hook keyboard bag triggers to respect the toggle state
 hooksecurefunc("OpenAllBags", function()
     ToggleNova()
 end)
