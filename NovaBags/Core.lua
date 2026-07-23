@@ -54,7 +54,7 @@ logo:SetPoint("RIGHT", title, "LEFT", -6, 0)
 NovaLogo = logo
 
 ------------------------------------------------
--- Close Button (Positioned Top-Left Near Header)
+-- Close Button
 ------------------------------------------------
 
 local close = CreateFrame("Button", nil, NovaFrame, "UIPanelCloseButton")
@@ -62,19 +62,19 @@ close:SetPoint("TOPLEFT", header, "TOPLEFT", 18, -12)
 close:SetScript("OnClick", function() NovaFrame:Hide() end)
 
 ------------------------------------------------
--- Corner Emblems (Positioned Higher Above Item Slots)
+-- Corner Emblems (Inside the Frame Borders)
 ------------------------------------------------
 
 local leftCorner = NovaFrame:CreateTexture(nil, "OVERLAY")
-leftCorner:SetSize(54, 54)
-leftCorner:SetPoint("TOPLEFT", NovaFrame, "TOPLEFT", -10, 38)
+leftCorner:SetSize(42, 42)
+leftCorner:SetPoint("TOPLEFT", NovaFrame, "TOPLEFT", 2, -2)
 
 local rightCorner = NovaFrame:CreateTexture(nil, "OVERLAY")
-rightCorner:SetSize(54, 54)
-rightCorner:SetPoint("TOPRIGHT", NovaFrame, "TOPRIGHT", 10, 38)
+rightCorner:SetSize(42, 42)
+rightCorner:SetPoint("TOPRIGHT", NovaFrame, "TOPRIGHT", -2, -2)
 rightCorner:SetTexCoord(1, 0, 0, 1)
 
--- Subtle Pulse Animation
+-- Subtle Pulse Animation (VFX)
 local animGroup = NovaFrame:CreateAnimationGroup()
 animGroup:SetLooping("REPEAT")
 
@@ -115,20 +115,20 @@ scrollFrame:SetScript("OnMouseWheel", function(self, delta)
 end)
 
 ------------------------------------------------
--- Themes & Unique Creature Emblems
+-- Themes & Dynamic Slot Tinting
 ------------------------------------------------
 
 local EMBLEM_LION    = "Interface\\MainMenuBar\\UI-MainMenuBar-EndCap-Human"
 local EMBLEM_DRAGON  = "Interface\\MainMenuBar\\UI-MainMenuBar-EndCap-Dwarf"
-local EMBLEM_SERPENT = "Interface\\TargetingFrame\\UI-TargetingFrame-Elite"
-local EMBLEM_GRYPHON = "Interface\\TargetingFrame\\UI-TargetingFrame-Rare-Elite"
+local EMBLEM_DWARF   = "Interface\\FrameXML\\UI-Frame-Dwarf-Corner"
+local EMBLEM_ELF     = "Interface\\FrameXML\\UI-Frame-NightElf-Corner"
 local EMBLEM_WING    = "Interface\\TutorialFrame\\UI-TutorialFrame-LevelUp"
 
 NovaThemes = {
     Default      = { 0.10, 0.10, 0.10, 0.70, 0.70, 0.70, "Interface\\Icons\\INV_Misc_QuestionMark", EMBLEM_LION },
     ObsidianGold = { 0.02, 0.02, 0.02, 0.85, 0.65, 0.15, "Interface\\Icons\\INV_Ingot_05",           EMBLEM_DRAGON },
-    Shadow       = { 0.04, 0.03, 0.06, 0.50, 0.20, 0.80, "Interface\\Icons\\Spell_Shadow_Shadesofdark", EMBLEM_SERPENT },
-    Arcane       = { 0.08, 0.02, 0.15, 0.50, 0.30, 1.00, "Interface\\Icons\\Spell_Arcane_Arcane01",     EMBLEM_GRYPHON },
+    Shadow       = { 0.04, 0.03, 0.06, 0.50, 0.20, 0.80, "Interface\\Icons\\Spell_Shadow_Shadesofdark", EMBLEM_ELF },
+    Arcane       = { 0.08, 0.02, 0.15, 0.50, 0.30, 1.00, "Interface\\Icons\\Spell_Arcane_Arcane01",     EMBLEM_DWARF },
     Starfire     = { 0.02, 0.08, 0.18, 0.20, 0.60, 1.00, "Interface\\Icons\\Spell_Arcane_StarFire",     EMBLEM_WING }
 }
 
@@ -145,6 +145,13 @@ function NovaApplyTheme(name)
 
     leftCorner:SetVertexColor(t[4], t[5], t[6], 1)
     rightCorner:SetVertexColor(t[4], t[5], t[6], 1)
+
+    -- Tint all item slot backgrounds to match theme border accent
+    for _, btn in ipairs(NovaSlots) do
+        if btn.bg then
+            btn.bg:SetVertexColor(t[4], t[5], t[6], 0.8)
+        end
+    end
 end
 
 local themeOrder = { "Default", "ObsidianGold", "Shadow", "Arcane", "Starfire" }
@@ -160,8 +167,6 @@ for i, name in ipairs(themeOrder) do
     b:SetNormalTexture(NovaThemes[name][7])
     b:SetScript("OnClick", function() NovaApplyTheme(name) end)
 end
-
-NovaApplyTheme("ObsidianGold")
 
 ------------------------------------------------
 -- Slots Creation & Dynamic Scroll Height
@@ -326,5 +331,6 @@ SlashCmdList["NOVA"] = function()
     else
         NovaFrame:Show()
         NovaDisplayItems()
+        NovaApplyTheme("ObsidianGold")
     end
 end
