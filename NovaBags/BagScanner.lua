@@ -9,7 +9,6 @@ NovaInventory = {}
 function NovaScanBags()
     wipe(NovaInventory)
 
-    -- Loop through backpack (0) and 4 container bags (1-4)
     for bag = 0, 4 do
         local slots = GetContainerNumSlots(bag)
         if slots and slots > 0 then
@@ -28,9 +27,6 @@ function NovaScanBags()
     end
 end
 
-------------------------------------------------
--- Update when bags change
-------------------------------------------------
 local scanner = CreateFrame("Frame")
 scanner:RegisterEvent("BAG_UPDATE")
 scanner:SetScript("OnEvent", function()
