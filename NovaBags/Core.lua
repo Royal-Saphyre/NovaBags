@@ -70,7 +70,7 @@ scrollFrame:SetPoint("TOPLEFT", NovaFrame, "TOPLEFT", 15, -45)
 scrollFrame:SetPoint("BOTTOMRIGHT", NovaFrame, "BOTTOMRIGHT", -35, 45)
 
 local scrollChild = CreateFrame("Frame", "NovaBagScrollChild", scrollFrame)
-scrollChild:SetSize(320, 1) -- Height updates dynamically in NovaCreateSlots
+scrollChild:SetSize(320, 1)
 scrollFrame:SetScrollChild(scrollChild)
 
 -- Enable Mousewheel Scrolling
@@ -87,15 +87,15 @@ scrollFrame:SetScript("OnMouseWheel", function(self, delta)
 end)
 
 ------------------------------------------------
--- Themes (Relocated cleanly to footer)
+-- Themes
 ------------------------------------------------
 
 NovaThemes = {
-    Default     = { 0.10, 0.10, 0.10, 0.70, 0.70, 0.70, "Interface\\Icons\\INV_Misc_QuestionMark" },
+    Default      = { 0.10, 0.10, 0.10, 0.70, 0.70, 0.70, "Interface\\Icons\\INV_Misc_QuestionMark" },
     ObsidianGold = { 0.02, 0.02, 0.02, 0.85, 0.65, 0.15, "Interface\\Icons\\INV_Ingot_05" },
-    Shadow      = { 0.04, 0.03, 0.06, 0.50, 0.20, 0.80, "Interface\\Icons\\Spell_Shadow_Shadesofdark" },
-    Arcane      = { 0.08, 0.02, 0.15, 0.50, 0.30, 1.00, "Interface\\Icons\\Spell_Arcane_Arcane01" },
-    Starfire    = { 0.02, 0.08, 0.18, 0.20, 0.60, 1.00, "Interface\\Icons\\Spell_Arcane_StarFire" }
+    Shadow       = { 0.04, 0.03, 0.06, 0.50, 0.20, 0.80, "Interface\\Icons\\Spell_Shadow_Shadesofdark" },
+    Arcane       = { 0.08, 0.02, 0.15, 0.50, 0.30, 1.00, "Interface\\Icons\\Spell_Arcane_Arcane01" },
+    Starfire     = { 0.02, 0.08, 0.18, 0.20, 0.60, 1.00, "Interface\\Icons\\Spell_Arcane_StarFire" }
 }
 
 function NovaApplyTheme(name)
@@ -146,7 +146,6 @@ function NovaCreateSlots(amount)
         NovaSlots[i] = button
     end
 
-    -- Update Scroll Child Height based on calculated rows
     local totalRows = math.ceil(amount / COLUMNS)
     scrollChild:SetHeight(math.max(totalRows * SPACING, 10))
 end
