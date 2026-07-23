@@ -10,10 +10,11 @@ function NovaCreateItemButton(parent, index)
     button:SetSize(32, 32)
     button:SetFrameLevel(parent:GetFrameLevel() + 2)
 
-    -- Background texture for empty slots
+    -- Empty slot background
     local bg = button:CreateTexture(nil, "BACKGROUND")
     bg:SetAllPoints(button)
     bg:SetTexture("Interface\\PaperDoll\\UI-Backpack-EmptySlot")
+    button.bg = bg
 
     -- Icon Texture
     local icon = button:CreateTexture(nil, "BORDER")
@@ -32,11 +33,11 @@ function NovaCreateItemButton(parent, index)
     hl:SetAllPoints(button)
     button:SetHighlightTexture(hl)
 
-    -- Fixed Tooltip Display
+    -- Tooltip Display
     button:SetScript("OnEnter", function(self)
         if self.bagID and self.slotID then
-            local texture = GetContainerItemLink(self.bagID, self.slotID)
-            if texture then
+            local link = GetContainerItemLink(self.bagID, self.slotID)
+            if link then
                 GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
                 GameTooltip:SetBagItem(self.bagID, self.slotID)
                 GameTooltip:Show()
