@@ -1,10 +1,7 @@
 --=============================================================================
 -- NovaBags
 -- File: Core.lua
---
--- Main NovaBags window
 --=============================================================================
-
 
 NovaFrame = CreateFrame(
     "Frame",
@@ -53,31 +50,27 @@ NovaFrame:SetMovable(true)
 
 NovaFrame:EnableMouse(true)
 
-NovaFrame:RegisterForDrag(
-    "LeftButton"
-)
+NovaFrame:RegisterForDrag("LeftButton")
 
 
 
 NovaFrame:SetScript(
-    "OnDragStart",
-    function(self)
+"OnDragStart",
+function(self)
 
-        self:StartMoving()
+self:StartMoving()
 
-    end
-)
+end)
 
 
 
 NovaFrame:SetScript(
-    "OnDragStop",
-    function(self)
+"OnDragStop",
+function(self)
 
-        self:StopMovingOrSizing()
+self:StopMovingOrSizing()
 
-    end
-)
+end)
 
 
 
@@ -89,34 +82,6 @@ NovaFrame:Hide()
 -- Header
 ---------------------------------------------------
 
-local header =
-NovaFrame:CreateTexture(
-nil,
-"ARTWORK"
-)
-
-
-header:SetTexture(
-"Interface\\DialogFrame\\UI-DialogBox-Header"
-)
-
-
-header:SetSize(
-300,
-64
-)
-
-
-header:SetPoint(
-"TOP",
-NovaFrame,
-"TOP",
-0,
-12
-)
-
-
-
 local title =
 NovaFrame:CreateFontString(
 nil,
@@ -127,10 +92,8 @@ nil,
 
 title:SetPoint(
 "TOP",
-header,
-"TOP",
 0,
--14
+-20
 )
 
 
@@ -141,7 +104,7 @@ title:SetText(
 
 
 ---------------------------------------------------
--- Close Button
+-- Close
 ---------------------------------------------------
 
 local close =
@@ -155,8 +118,8 @@ NovaFrame,
 
 close:SetPoint(
 "TOPRIGHT",
--2,
--6
+-5,
+-5
 )
 
 
@@ -171,7 +134,7 @@ end)
 
 
 ---------------------------------------------------
--- Bag Slot Container
+-- Container
 ---------------------------------------------------
 
 local holder =
@@ -190,165 +153,140 @@ holder:SetPoint(
 
 
 
----------------------------------------------------
--- Bag Slot Settings
----------------------------------------------------
-
-local SLOT_SIZE = 30
-local SLOT_SPACE = 34
-local SLOTS_PER_ROW = 10
+local SIZE = 30
+local GAP = 34
+local PER_ROW = 10
 
 
 
 ---------------------------------------------------
--- Display Bag Slots
+-- Draw bags
 ---------------------------------------------------
 
 function NovaDisplayItems()
 
 
-    local index = 1
+local index = 1
 
 
 
-    for bag = 0,4 do
+for bag = 0,4 do
 
 
-        local slots =
-        GetContainerNumSlots(bag)
 
+local slots =
+GetContainerNumSlots(bag)
 
 
-        for slot = 1,slots do
 
+for slot = 1,slots do
 
 
-            local button =
-            NovaItemButtons[index]
 
+local button =
+NovaItemButtons[index]
 
 
-            if not button then
 
+if not button then
 
-                button =
-                NovaCreateItemButton(
-                    holder,
-                    index
-                )
 
+button =
+NovaCreateItemButton(
+holder,
+index
+)
 
-            end
 
+end
 
 
-            button:SetSize(
-                SLOT_SIZE,
-                SLOT_SIZE
-            )
 
+button:SetPoint(
+"TOPLEFT",
+((index-1)%PER_ROW)*GAP,
+-math.floor((index-1)/PER_ROW)*GAP
+)
 
 
-            button:SetPoint(
-                "TOPLEFT",
-                ((index-1)%SLOTS_PER_ROW) * SLOT_SPACE,
-                -math.floor((index-1)/SLOTS_PER_ROW) * SLOT_SPACE
-            )
 
+button.bagID =
+bag
 
 
-            button.bagID =
-            bag
+button.slotID =
+slot
 
 
-            button.slotID =
-            slot
 
+local texture,count =
+GetContainerItemInfo(
+bag,
+slot
+)
 
 
-            local texture,count =
-            GetContainerItemInfo(
-                bag,
-                slot
-            )
 
+button.link =
+GetContainerItemLink(
+bag,
+slot
+)
 
 
-            local link =
-            GetContainerItemLink(
-                bag,
-                slot
-            )
 
+if texture then
 
 
-            button.link =
-            link
+button.icon:SetTexture(
+texture
+)
 
 
+else
 
-            if texture then
 
+button.icon:SetTexture(
+"Interface\\Buttons\\UI-EmptySlot"
+)
 
 
-                button.icon:SetTexture(
-                    texture
-                )
+end
 
 
 
-                if count and count > 1 then
+if count and count > 1 then
 
-                    button.count:SetText(
-                        count
-                    )
 
-                else
+button.count:SetText(
+count
+)
 
-                    button.count:SetText("")
 
-                end
+else
 
 
+button.count:SetText(
+""
+)
 
-            else
 
+end
 
 
-                button.icon:SetTexture(
-                    "Interface\\Buttons\\UI-EmptySlot"
-                )
 
+button:Show()
 
 
-                button.count:SetText("")
 
+index=index+1
 
 
-            end
 
+end
 
 
-            button:Show()
-
-
-
-            index = index + 1
-
-
-
-        end
-
-
-    end
-
-
-
-    for i = index,#NovaItemButtons do
-
-        NovaItemButtons[i]:Hide()
-
-    end
+end
 
 
 
@@ -357,90 +295,118 @@ end
 
 
 ---------------------------------------------------
--- Open NovaBags instead of Blizzard bags
+-- Open Nova
 ---------------------------------------------------
 
 function NovaToggle()
 
 
-    if NovaFrame:IsShown() then
+if NovaFrame:IsShown() then
 
 
-        NovaFrame:Hide()
+NovaFrame:Hide()
 
 
-    else
+else
 
 
-        NovaFrame:Show()
+NovaFrame:Show()
 
-        NovaDisplayItems()
-
-
-    end
+NovaDisplayItems()
 
 
 end
 
-
-
-function ToggleBackpack()
-
-    NovaToggle()
-
-end
-
-
-
-function OpenBackpack()
-
-    NovaToggle()
-
-end
-
-
-
-function OpenAllBags()
-
-    NovaToggle()
-
-end
-
-
-
-function ToggleAllBags()
-
-    NovaToggle()
 
 end
 
 
 
 ---------------------------------------------------
--- Refresh when bags update
+-- Replace bag key functions
 ---------------------------------------------------
 
-local update =
+ToggleBackpack =
+NovaToggle
+
+
+OpenBackpack =
+NovaToggle
+
+
+OpenAllBags =
+NovaToggle
+
+
+ToggleAllBags =
+NovaToggle
+
+
+
+---------------------------------------------------
+-- Hook Blizzard bag buttons
+---------------------------------------------------
+
+local hookFrame =
 CreateFrame("Frame")
 
 
-
-update:RegisterEvent(
-"BAG_UPDATE"
+hookFrame:RegisterEvent(
+"PLAYER_LOGIN"
 )
 
 
-
-update:SetScript(
+hookFrame:SetScript(
 "OnEvent",
 function()
 
 
-    if NovaFrame:IsShown() then
 
-        NovaDisplayItems()
+if MainMenuBarBackpackButton then
 
-    end
+
+MainMenuBarBackpackButton:SetScript(
+"OnClick",
+function()
+
+NovaToggle()
+
+end)
+
+
+end
+
+
+
+for i=0,4 do
+
+
+
+local button =
+_G["CharacterBag"..i.."Slot"]
+
+
+
+if button then
+
+
+
+button:SetScript(
+"OnClick",
+function()
+
+NovaToggle()
+
+end)
+
+
+
+end
+
+
+
+end
+
 
 
 end)
@@ -448,16 +414,43 @@ end)
 
 
 ---------------------------------------------------
--- Slash Command
+-- Refresh
 ---------------------------------------------------
 
-SLASH_NOVA1 = "/nova"
+local updater =
+CreateFrame("Frame")
 
 
+updater:RegisterEvent(
+"BAG_UPDATE"
+)
 
-SlashCmdList["NOVA"] =
+
+updater:SetScript(
+"OnEvent",
 function()
 
-    NovaToggle()
+
+if NovaFrame:IsShown() then
+
+NovaDisplayItems()
+
+end
+
+
+end)
+
+
+
+---------------------------------------------------
+-- Slash
+---------------------------------------------------
+
+SLASH_NOVA1="/nova"
+
+
+SlashCmdList["NOVA"]=function()
+
+NovaToggle()
 
 end
