@@ -43,9 +43,10 @@ header:SetSize(260, 50)
 header:SetPoint("TOP", 0, 10)
 NovaHeader = header
 
+-- Star Icon near Title (Distinct from Starfire theme)
 local logo = NovaFrame:CreateTexture(nil, "OVERLAY")
-logo:SetTexture("Interface\\Icons\\INV_Misc_Orb_05")
-logo:SetSize(32, 32)
+logo:SetTexture("Interface\\Icons\\Ability_Druid_Starfall")
+logo:SetSize(30, 30)
 logo:SetPoint("LEFT", header, "LEFT", 25, 0)
 NovaLogo = logo
 
@@ -73,7 +74,6 @@ local scrollChild = CreateFrame("Frame", "NovaBagScrollChild", scrollFrame)
 scrollChild:SetSize(320, 1)
 scrollFrame:SetScrollChild(scrollChild)
 
--- Enable Mousewheel Scrolling
 scrollFrame:EnableMouseWheel(true)
 scrollFrame:SetScript("OnMouseWheel", function(self, delta)
     local current = self:GetVerticalScroll()
@@ -109,7 +109,6 @@ end
 
 local themeOrder = { "Default", "ObsidianGold", "Shadow", "Arcane", "Starfire" }
 
--- Footer Panel for Theme Selectors
 local themeFooterLabel = NovaFrame:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
 themeFooterLabel:SetPoint("BOTTOMLEFT", 15, 16)
 themeFooterLabel:SetText("Themes:")
@@ -151,11 +150,30 @@ function NovaCreateSlots(amount)
 end
 
 ------------------------------------------------
--- Display Items
+-- Display & Sort Logic
 ------------------------------------------------
 
-function NovaDisplayItems()
+function NovaDisplayItems(sorted)
     NovaScanBags()
+
+    if sorted then
+        table.sort(NovaInventory, function(a, b)
+            if not a.link then return false end
+            if not b.link then return true end
+
+            local _, _, qA = GetItemInfo(a.link)
+            local _, _, qB = GetItemInfo(b.link)
+
+            qA = qA or -1
+            qB = qB or -1
+
+            if qA ~= qB then
+                return qA > qB
+            end
+
+            return (a.link or "") < (b.link or "")
+        end)
+    end
 
     local count = #NovaInventory
     NovaCreateSlots(count)
@@ -184,14 +202,20 @@ function NovaDisplayItems()
 end
 
 ------------------------------------------------
--- Footer Scan Button
+-- Footer Action Buttons
 ------------------------------------------------
 
 local scan = CreateFrame("Button", nil, NovaFrame, "UIPanelButtonTemplate")
-scan:SetSize(60, 20)
+scan:SetSize(50, 20)
 scan:SetPoint("BOTTOMRIGHT", -15, 12)
 scan:SetText("Scan")
-scan:SetScript("OnClick", NovaDisplayItems)
+scan:SetScript("OnClick", function() NovaDisplayItems(false) end)
+
+local sortBtn = CreateFrame("Button", nil, NovaFrame, "UIPanelButtonTemplate")
+sortBtn:SetSize(50, 20)
+sortBtn:SetPoint("RIGHT", scan, "LEFT", -4, 0)
+sortBtn:SetText("Sort")
+sortBtn:SetScript("OnClick", function() NovaDisplayItems(true) end)
 
 ------------------------------------------------
 -- Slash Command
@@ -203,6 +227,6 @@ SlashCmdList["NOVA"] = function()
         NovaFrame:Hide()
     else
         NovaFrame:Show()
-        NovaDisplayItems()
+        NovaDisplayItems(false)
     end
 end
