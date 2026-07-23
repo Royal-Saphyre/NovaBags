@@ -17,38 +17,30 @@ function NovaScanBags()
     wipe(NovaInventory)
 
 
-    print("|cff00ff00Nova scanning bags...|r")
-
-
-
     for bag = 0,4 do
 
 
         local slots = GetContainerNumSlots(bag)
 
 
-        print("Bag "..bag.." slots: "..slots)
-
-
-
         for slot = 1, slots do
 
 
-            local texture, count, locked, quality, readable, lootable, link =
+            local texture, count, locked, quality =
             GetContainerItemInfo(
                 bag,
                 slot
             )
 
 
+            local link =
+            GetContainerItemLink(
+                bag,
+                slot
+            )
+
 
             if link then
-
-
-                print(
-                    "Found item:",
-                    link
-                )
 
 
                 table.insert(
@@ -76,16 +68,6 @@ function NovaScanBags()
 
 
     end
-
-
-
-    print(
-        "|cff00ff00Nova found "
-        ..
-        #NovaInventory
-        ..
-        " items|r"
-    )
 
 
 end
