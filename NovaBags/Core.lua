@@ -397,70 +397,37 @@ end
 
 
 
-
 ------------------------------------------------
 -- Display Items
 ------------------------------------------------
 
 function NovaDisplayItems()
+    NovaScanBags()
 
+    local count = #NovaInventory
+    NovaCreateSlots(count)
 
-NovaScanBags()
+    for i, button in ipairs(NovaSlots) do
+        local item = NovaInventory[i]
 
+        if item then
+            button.bagID = item.bagID
+            button.slotID = item.slotID
+            button.link = item.link
 
+            if item.texture then
+                button.icon:SetTexture(item.texture)
+                button.icon:Show()
+            else
+                button.icon:SetTexture(nil)
+            end
 
-local count =
-#NovaInventory
-
-
-
-NovaCreateSlots(
-count
-)
-
-
-
-for i,button in ipairs(NovaSlots) do
-
-
-local item =
-NovaInventory[i]
-
-
-if item then
-
-
-button.bagID =
-item.bagID
-
-
-button.slotID =
-item.slotID
-
-
-button.link =
-item.link
-
-
-button.icon:SetTexture(
-item.texture
-)
-
-
-button.count:SetText(
-item.count or ""
-)
-
-
-button:Show()
-
-
-else
-
-
-button:Hide()
-
-
+            button.count:SetText(item.count)
+            button:Show()
+        else
+            button:Hide()
+        end
+    end
 end
 
 
