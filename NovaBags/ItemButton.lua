@@ -1,64 +1,36 @@
 --=============================================================================
 -- NovaBags
 -- File: ItemButton.lua
---
--- Creates bag slots
 --=============================================================================
 
-NovaItemButtons = {}
 
+NovaItemButtons = {}
 
 
 function NovaCreateItemButton(parent,index)
 
 
-    local button =
-    CreateFrame(
+    local button = CreateFrame(
         "Button",
         "NovaItemButton"..index,
         parent
     )
 
 
-
-    button:SetSize(
-        32,
-        32
-    )
+    button:SetSize(30,30)
 
 
-
-    button:RegisterForClicks(
-        "LeftButtonUp",
-        "RightButtonUp"
-    )
-
-
-
-    button:RegisterForDrag(
-        "LeftButton"
-    )
-
-
-
-    ---------------------------------------------------
-    -- Icon
-    ---------------------------------------------------
 
     button.icon =
     button:CreateTexture(
         nil,
-        "ARTWORK"
+        "BACKGROUND"
     )
 
 
     button.icon:SetAllPoints()
 
 
-
-    ---------------------------------------------------
-    -- Count
-    ---------------------------------------------------
 
     button.count =
     button:CreateFontString(
@@ -69,26 +41,17 @@ function NovaCreateItemButton(parent,index)
 
     button.count:SetFont(
         "Fonts\\FRIZQT__.TTF",
-        11,
+        10,
         "OUTLINE"
     )
 
 
     button.count:SetPoint(
         "BOTTOMRIGHT",
-        -2,
+        -1,
         1
     )
 
-
-
-    ---------------------------------------------------
-    -- Slot border
-    ---------------------------------------------------
-
-    button:SetNormalTexture(
-        "Interface\\Buttons\\UI-Quickslot2"
-    )
 
 
     button:SetHighlightTexture(
@@ -97,112 +60,71 @@ function NovaCreateItemButton(parent,index)
 
 
 
-    ---------------------------------------------------
-    -- Click
-    ---------------------------------------------------
-
     button:SetScript(
-    "OnClick",
-    function(self,mouse)
+        "OnEnter",
+        function(self)
 
 
-        if not self.bagID then
-            return
-        end
+            if self.link then
 
 
-
-        if mouse == "LeftButton" then
-
-
-            PickupContainerItem(
-                self.bagID,
-                self.slotID
-            )
+                GameTooltip:SetOwner(
+                    self,
+                    "ANCHOR_RIGHT"
+                )
 
 
-        elseif mouse == "RightButton" then
+                GameTooltip:SetHyperlink(
+                    self.link
+                )
 
 
-            UseContainerItem(
-                self.bagID,
-                self.slotID
-            )
+                GameTooltip:Show()
+
+
+            end
 
 
         end
+    )
 
 
-    end)
-
-
-
-    ---------------------------------------------------
-    -- Drag
-    ---------------------------------------------------
 
     button:SetScript(
-    "OnDragStart",
-    function(self)
+        "OnLeave",
+        function()
+
+            GameTooltip:Hide()
+
+        end
+    )
 
 
-        PickupContainerItem(
-            self.bagID,
-            self.slotID
-        )
-
-
-    end)
-
-
-
-    ---------------------------------------------------
-    -- Tooltip
-    ---------------------------------------------------
 
     button:SetScript(
-    "OnEnter",
-    function(self)
+        "OnClick",
+        function(self)
 
 
-        if self.link then
+            if self.link then
 
+                PickupContainerItem(
+                    self.bagID,
+                    self.slotID
+                )
 
-            GameTooltip:SetOwner(
-                self,
-                "ANCHOR_RIGHT"
-            )
-
-
-            GameTooltip:SetHyperlink(
-                self.link
-            )
-
-
-            GameTooltip:Show()
+            end
 
 
         end
-
-
-    end)
-
-
-
-    button:SetScript(
-    "OnLeave",
-    function()
-
-        GameTooltip:Hide()
-
-    end)
+    )
 
 
 
     NovaItemButtons[index]=button
 
 
-
     return button
+
 
 end
