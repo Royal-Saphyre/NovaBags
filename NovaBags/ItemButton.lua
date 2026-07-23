@@ -2,7 +2,7 @@
 -- NovaBags
 -- File: ItemButton.lua
 --
--- Real WoW container-style item buttons
+-- Blizzard-style item buttons
 --=============================================================================
 
 NovaItemButtons = {}
@@ -32,22 +32,19 @@ function NovaCreateItemButton(parent, index)
 
 
 
-    -- store reference
-    NovaItemButtons[index] = button
-
-
-
     ------------------------------------------------
     -- Count text
     ------------------------------------------------
 
     if not button.Count then
 
+
         button.Count =
         button:CreateFontString(
             nil,
             "OVERLAY"
         )
+
 
         button.Count:SetFont(
             "Fonts\\FRIZQT__.TTF",
@@ -61,6 +58,7 @@ function NovaCreateItemButton(parent, index)
             -2,
             2
         )
+
 
     end
 
@@ -114,61 +112,21 @@ function NovaCreateItemButton(parent, index)
 
 
     ------------------------------------------------
-    -- Click handling
+    -- Save reference
     ------------------------------------------------
 
-    button:RegisterForClicks(
-        "LeftButtonUp",
-        "RightButtonUp"
-    )
-
-
-    button:SetScript(
-        "OnClick",
-        function(self, buttonName)
-
-
-            if not self.bagID then
-                return
-            end
-
-
-
-            if buttonName == "LeftButton" then
-
-
-                PickupContainerItem(
-                    self.bagID,
-                    self.slotID
-                )
-
-
-
-            elseif buttonName == "RightButton" then
-
-
-                UseContainerItem(
-                    self.bagID,
-                    self.slotID
-                )
-
-
-            end
-
-
-        end
-    )
-
+    NovaItemButtons[index] = button
 
 
     return button
+
 
 end
 
 
 
 ------------------------------------------------
--- Update item button
+-- Update item data
 ------------------------------------------------
 
 function NovaUpdateItemButton(button, item)
@@ -182,23 +140,40 @@ function NovaUpdateItemButton(button, item)
     item.slotID
 
 
+
     button.link =
     item.link
 
 
 
-    button.icon:SetTexture(
-        item.texture or
-        "Interface\\Icons\\INV_Misc_QuestionMark"
+    -- Required by Blizzard container buttons
+
+    button:SetID(
+        item.slotID
     )
+
+
+
+    if button.icon then
+
+
+        button.icon:SetTexture(
+            item.texture or
+            "Interface\\Icons\\INV_Misc_QuestionMark"
+        )
+
+
+    end
 
 
 
     if button.Count then
 
+
         button.Count:SetText(
             item.count or 1
         )
+
 
     end
 
