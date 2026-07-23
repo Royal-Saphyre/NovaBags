@@ -3,8 +3,6 @@
 -- File: Core.lua
 --=============================================================================
 
-
-local ICON_SIZE = 32
 local SPACING = 36
 local COLUMNS = 10
 local TOTAL_SLOTS = 100
@@ -27,6 +25,7 @@ NovaFrame:SetSize(
 )
 
 
+-- right side bag position
 NovaFrame:SetPoint(
     "RIGHT",
     UIParent,
@@ -38,11 +37,9 @@ NovaFrame:SetPoint(
 
 NovaFrame:SetBackdrop({
 
-    bgFile =
-    "Interface\\Tooltips\\UI-Tooltip-Background",
+    bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
 
-    edgeFile =
-    "Interface\\Tooltips\\UI-Tooltip-Border",
+    edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
 
     edgeSize = 16,
 
@@ -56,9 +53,29 @@ NovaFrame:SetBackdrop({
 })
 
 
+NovaFrame:SetBackdropColor(
+    0.02,
+    0.02,
+    0.02,
+    0.95
+)
+
+
+NovaFrame:SetBackdropBorderColor(
+    0.85,
+    0.65,
+    0.15,
+    1
+)
+
+
+
 NovaFrame:SetMovable(true)
 NovaFrame:EnableMouse(true)
-NovaFrame:RegisterForDrag("LeftButton")
+
+NovaFrame:RegisterForDrag(
+    "LeftButton"
+)
 
 
 NovaFrame:SetScript(
@@ -77,7 +94,6 @@ function(self)
 self:StopMovingOrSizing()
 
 end)
-
 
 
 NovaFrame:Hide()
@@ -139,19 +155,9 @@ title:SetText(
 )
 
 
-title:SetJustifyH(
-"CENTER"
-)
-
-
-title:SetJustifyV(
-"MIDDLE"
-)
-
-
 
 ------------------------------------------------
--- Close
+-- Close button
 ------------------------------------------------
 
 local close =
@@ -184,45 +190,81 @@ end)
 -- Themes
 ------------------------------------------------
 
-local themes = {
+NovaThemes = {
 
-
-Default={
-0.1,0.1,0.1,1,
+Default = {
+0.1,0.1,0.1,
 0.7,0.7,0.7
 },
 
-
-ObsidianGold={
-0.02,0.02,0.02,1,
+ObsidianGold = {
+0.02,0.02,0.02,
 0.85,0.65,0.15
 },
 
-
-Shadow={
-0.04,0.03,0.06,1,
+Shadow = {
+0.04,0.03,0.06,
 0.4,0.2,0.8
 },
 
-
-Arcane={
-0.08,0.02,0.15,1,
+Arcane = {
+0.08,0.02,0.15,
 0.5,0.3,1
 },
 
-
-Nature={
-0.02,0.12,0.04,1,
+Nature = {
+0.02,0.12,0.04,
 0.3,0.8,0.3
 }
 
-
 }
 
 
 
-local themeNames =
-{
+function NovaApplyTheme(name)
+
+
+local t =
+NovaThemes[name]
+
+
+if not t then return end
+
+
+
+NovaFrame:SetBackdropColor(
+t[1],
+t[2],
+t[3],
+0.95
+)
+
+
+NovaFrame:SetBackdropBorderColor(
+t[4],
+t[5],
+t[6],
+1
+)
+
+
+NovaHeader:SetVertexColor(
+t[4],
+t[5],
+t[6],
+1
+)
+
+
+end
+
+
+
+------------------------------------------------
+-- Theme buttons
+------------------------------------------------
+
+local themeList = {
 "Default",
 "ObsidianGold",
 "Shadow",
@@ -232,50 +274,10 @@ local themeNames =
 
 
 
-function NovaApplyTheme(name)
+for i,name in ipairs(themeList) do
 
 
-local t =
-themes[name]
-
-
-NovaFrame:SetBackdropColor(
-t[1],
-t[2],
-t[3],
-t[4]
-)
-
-
-NovaFrame:SetBackdropBorderColor(
-t[5],
-t[6],
-t[7],
-1
-)
-
-
-
-if NovaHeader then
-
-NovaHeader:SetVertexColor(
-t[5],
-t[6],
-t[7],
-1
-)
-
-end
-
-
-end
-
-
-
-for i,name in ipairs(themeNames) do
-
-
-local button =
+local b =
 CreateFrame(
 "Button",
 nil,
@@ -283,57 +285,31 @@ NovaFrame
 )
 
 
-button:SetSize(
+b:SetSize(
 22,
 22
 )
 
 
-button:SetPoint(
+b:SetPoint(
 "TOPRIGHT",
--20 - (i*25),
+-20-(i*25),
 -15
 )
 
 
 
-button:SetNormalTexture(
+b:SetNormalTexture(
 "Interface\\Icons\\INV_Misc_QuestionMark"
 )
 
 
 
-button:SetScript(
+b:SetScript(
 "OnClick",
 function()
 
 NovaApplyTheme(name)
-
-end)
-
-
-
-button:SetScript(
-"OnEnter",
-function(self)
-
-GameTooltip:SetOwner(
-self,
-"ANCHOR_RIGHT"
-)
-
-GameTooltip:SetText(name)
-
-GameTooltip:Show()
-
-end)
-
-
-button:SetScript(
-"OnLeave",
-function()
-
-GameTooltip:Hide()
 
 end)
 
@@ -360,26 +336,24 @@ NovaSlots = {}
 for i=1,TOTAL_SLOTS do
 
 
-local slot =
+local button =
 NovaCreateItemButton(
 NovaFrame,
 i
 )
 
 
-slot:SetPoint(
+button:SetPoint(
 "TOPLEFT",
 20 + ((i-1)%COLUMNS)*SPACING,
 -55 - math.floor((i-1)/COLUMNS)*SPACING
 )
 
 
-
-slot:Hide()
-
+button:Hide()
 
 
-NovaSlots[i]=slot
+NovaSlots[i]=button
 
 
 end
@@ -395,7 +369,7 @@ function NovaDisplayItems()
 
 if not NovaScanBags then
 
-print("NovaBags: Scanner missing")
+print("NovaBags: Missing scanner")
 return
 
 end
@@ -403,6 +377,9 @@ end
 
 
 NovaScanBags()
+
+
+print("Nova found:",#NovaInventory)
 
 
 
@@ -427,11 +404,6 @@ item
 )
 
 
-button:SetID(
-item.slotID
-)
-
-
 else
 
 
@@ -441,13 +413,10 @@ button:Hide()
 end
 
 
-
 end
 
 
-
 end
-
 
 
 
@@ -493,7 +462,7 @@ end)
 
 
 ------------------------------------------------
--- Slash
+-- Slash command
 ------------------------------------------------
 
 SLASH_NOVA1="/nova"
