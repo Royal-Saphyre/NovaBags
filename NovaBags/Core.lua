@@ -6,7 +6,7 @@
 local SPACING = 36
 local COLUMNS = 9
 
--- Active sorting state
+-- Sorting mode state
 NovaIsSorted = false
 
 ------------------------------------------------
@@ -37,7 +37,7 @@ NovaFrame:SetScript("OnDragStop", function(self) self:StopMovingOrSizing() end)
 NovaFrame:Hide()
 
 ------------------------------------------------
--- Header & Title
+-- Header & Title (Adjusted Higher)
 ------------------------------------------------
 
 local header = NovaFrame:CreateTexture(nil, "ARTWORK")
@@ -46,13 +46,15 @@ header:SetSize(260, 50)
 header:SetPoint("TOP", 0, 10)
 NovaHeader = header
 
+-- Title moved slightly higher (+12 offset) to sit cleanly on banner
 local title = NovaFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-title:SetPoint("CENTER", header, "CENTER", 10, -2)
+title:SetPoint("TOP", header, "TOP", 10, -12)
 title:SetText("NovaBags")
 
+-- Icon raised alongside title
 local logo = NovaFrame:CreateTexture(nil, "OVERLAY")
 logo:SetTexture("Interface\\Icons\\Ability_Druid_Starfall")
-logo:SetSize(22, 22)
+logo:SetSize(20, 20)
 logo:SetPoint("RIGHT", title, "LEFT", -6, 0)
 NovaLogo = logo
 
@@ -164,7 +166,6 @@ function NovaDisplayItems(sorted)
 
     if NovaIsSorted then
         table.sort(NovaInventory, function(a, b)
-            -- Always push empty slots to the bottom
             if a.hasItem ~= b.hasItem then
                 return a.hasItem and not b.hasItem
             end
