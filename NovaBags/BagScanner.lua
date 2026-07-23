@@ -1,7 +1,7 @@
 --=============================================================================
 -- NovaBags
 -- File: BagScanner.lua
--- Scans player bags
+-- Scans player bags for 3.3.5a
 --=============================================================================
 
 NovaInventory = {}
@@ -9,6 +9,7 @@ NovaInventory = {}
 function NovaScanBags()
     wipe(NovaInventory)
 
+    -- Loop through backpack (0) and 4 container bags (1-4)
     for bag = 0, 4 do
         local slots = GetContainerNumSlots(bag)
         if slots and slots > 0 then
