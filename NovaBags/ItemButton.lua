@@ -1,148 +1,157 @@
+--=============================================================================
+-- NovaBags
+-- File: ItemButton.lua
+--
+-- Creates item buttons
+--=============================================================================
+
 NovaItemButtons = {}
 
 
-function NovaCreateItemButton(parent,index)
+function NovaCreateItemButton(parent, index)
 
 
-local button =
-CreateFrame(
-"Button",
-"NovaItemButton"..index,
-parent
-)
+    local button = CreateFrame(
+        "Button",
+        "NovaItemButton"..index,
+        parent
+    )
 
 
-button:SetSize(
-30,
-30
-)
+    button:SetSize(
+        30,
+        30
+    )
 
 
+    button.icon =
+    button:CreateTexture(
+        nil,
+        "BACKGROUND"
+    )
 
-button.icon =
-button:CreateTexture(
-nil,
-"BACKGROUND"
-)
 
+    button.icon:SetAllPoints()
 
-button.icon:SetAllPoints()
 
 
+    button.count =
+    button:CreateFontString(
+        nil,
+        "OVERLAY"
+    )
 
-button.count =
-button:CreateFontString(
-nil,
-"OVERLAY"
-)
 
+    button.count:SetFont(
+        "Fonts\\FRIZQT__.TTF",
+        10,
+        "OUTLINE"
+    )
 
-button.count:SetFont(
-"Fonts\\FRIZQT__.TTF",
-10,
-"OUTLINE"
-)
 
+    button.count:SetPoint(
+        "BOTTOMRIGHT",
+        -1,
+        1
+    )
 
-button.count:SetPoint(
-"BOTTOMRIGHT",
--1,
-1
-)
 
 
+    button:SetHighlightTexture(
+        "Interface\\Buttons\\ButtonHilight-Square"
+    )
 
-button:SetHighlightTexture(
-"Interface\\Buttons\\ButtonHilight-Square"
-)
 
 
+    button:RegisterForClicks(
+        "LeftButtonUp",
+        "RightButtonUp"
+    )
 
-button:RegisterForClicks(
-"LeftButtonUp",
-"RightButtonUp"
-)
 
 
+    button:SetScript(
+        "OnClick",
+        function(self, mouse)
 
-button:SetScript(
-"OnClick",
-function(self,button)
 
+            if not self.bagID then
+                return
+            end
 
-if not self.bagID then return end
 
 
+            if mouse == "LeftButton" then
 
-if button=="LeftButton" then
 
+                PickupContainerItem(
+                    self.bagID,
+                    self.slotID
+                )
 
-PickupContainerItem(
-self.bagID,
-self.slotID
-)
 
+            elseif mouse == "RightButton" then
 
 
-elseif button=="RightButton" then
+                UseContainerItem(
+                    self.bagID,
+                    self.slotID
+                )
 
 
-UseContainerItem(
-self.bagID,
-self.slotID
-)
+            end
 
 
-end
+        end
+    )
 
 
-end)
 
+    button:SetScript(
+        "OnEnter",
+        function(self)
 
 
-button:SetScript(
-"OnEnter",
-function(self)
+            if self.link then
 
 
-if self.link then
+                GameTooltip:SetOwner(
+                    self,
+                    "ANCHOR_RIGHT"
+                )
 
 
-GameTooltip:SetOwner(
-self,
-"ANCHOR_RIGHT"
-)
+                GameTooltip:SetHyperlink(
+                    self.link
+                )
 
 
-GameTooltip:SetHyperlink(
-self.link
-)
+                GameTooltip:Show()
 
 
-GameTooltip:Show()
+            end
 
 
-end
+        end
+    )
 
 
-end)
 
+    button:SetScript(
+        "OnLeave",
+        function()
 
+            GameTooltip:Hide()
 
-button:SetScript(
-"OnLeave",
-function()
+        end
+    )
 
-GameTooltip:Hide()
 
-end)
 
+    NovaItemButtons[index] = button
 
 
-NovaItemButtons[index]=button
-
-
-return button
+    return button
 
 
 end
