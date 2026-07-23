@@ -1,23 +1,34 @@
 --=============================================================================
 -- NovaBags
 -- File: ItemButton.lua
+-- Clean custom item button implementation
 --=============================================================================
 
 NovaItemButtons = {}
 
 function NovaCreateItemButton(parent, index)
-    local name = "NovaItemButton" .. index
-    -- Inherit the standard WotLK item button template
-    local button = CreateFrame("Button", name, parent, "ContainerFrameItemButtonTemplate")
-
+    local button = CreateFrame("Button", "NovaItemButton" .. index, parent)
     button:SetSize(32, 32)
-    button:SetFrameLevel(parent:GetFrameLevel() + 2)
+    button:SetFrameLevel(parent:GetFrameLevel() + 5)
 
-    -- Reference icon and count directly from the WoW template
-    button.icon = _G[name .. "IconTexture"]
-    button.count = _G[name .. "Count"]
+    -- Icon texture
+    local icon = button:CreateTexture(nil, "BORDER")
+    icon:SetAllPoints(button)
+    button.icon = icon
 
-    -- Hook Tooltip handling for 3.3.5a
+    -- Stack Count text
+    local count = button:CreateFontString(nil, "OVERLAY", "NumberFontNormal")
+    count:SetPoint("BOTTOMRIGHT", button, "BOTTOMRIGHT", -2, 2)
+    count:SetJustifyH("RIGHT")
+    button.count = count
+
+    -- Mouseover highlight texture
+    local hl = button:CreateTexture(nil, "HIGHLIGHT")
+    hl:SetTexture("Interface\\Buttons\\ButtonHilight-Square")
+    hl:SetAllPoints(button)
+    button:SetHighlightTexture(hl)
+
+    -- Tooltip handlers
     button:SetScript("OnEnter", function(self)
         if self.bagID and self.slotID then
             GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
@@ -30,14 +41,14 @@ function NovaCreateItemButton(parent, index)
         GameTooltip:Hide()
     end)
 
-    -- Item interaction (Right-Click to use/equip, Left-Click to pick up)
+    -- Click & Drag interaction
     button:RegisterForClicks("LeftButtonUp", "RightButtonUp")
-    button:SetScript("OnClick", function(self, buttonPressed)
+    button:SetScript("OnClick", function(self, btn)
         if not self.bagID or not self.slotID then return end
 
-        if buttonPressed == "RightButton" then
+        if btn == "RightButton" then
             UseContainerItem(self.bagID, self.slotID)
-        elseif buttonPressed == "LeftButton" then
+        else
             PickupContainerItem(self.bagID, self.slotID)
         end
     end)
