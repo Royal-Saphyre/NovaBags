@@ -32,6 +32,6 @@ local scanner = CreateFrame("Frame")
 scanner:RegisterEvent("BAG_UPDATE")
 scanner:SetScript("OnEvent", function()
     if NovaFrame and NovaFrame:IsShown() then
-        NovaDisplayItems(false)
+        NovaDisplayItems(NovaIsSorted)
     end
 end)
