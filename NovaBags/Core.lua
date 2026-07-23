@@ -54,7 +54,7 @@ logo:SetPoint("RIGHT", title, "LEFT", -6, 0)
 NovaLogo = logo
 
 ------------------------------------------------
--- Close Button (Moved near Header Banner)
+-- Close Button (Positioned Top-Left Near Header)
 ------------------------------------------------
 
 local close = CreateFrame("Button", nil, NovaFrame, "UIPanelCloseButton")
@@ -62,7 +62,7 @@ close:SetPoint("TOPLEFT", header, "TOPLEFT", 18, -12)
 close:SetScript("OnClick", function() NovaFrame:Hide() end)
 
 ------------------------------------------------
--- Corner Emblems (Moved Higher Above Item Slots)
+-- Corner Emblems (Positioned Higher Above Item Slots)
 ------------------------------------------------
 
 local leftCorner = NovaFrame:CreateTexture(nil, "OVERLAY")
@@ -72,9 +72,9 @@ leftCorner:SetPoint("TOPLEFT", NovaFrame, "TOPLEFT", -10, 38)
 local rightCorner = NovaFrame:CreateTexture(nil, "OVERLAY")
 rightCorner:SetSize(54, 54)
 rightCorner:SetPoint("TOPRIGHT", NovaFrame, "TOPRIGHT", 10, 38)
-rightCorner:SetTexCoord(1, 0, 0, 1) -- Mirror right emblem
+rightCorner:SetTexCoord(1, 0, 0, 1)
 
--- Subtle Pulse Animation (VFX)
+-- Subtle Pulse Animation
 local animGroup = NovaFrame:CreateAnimationGroup()
 animGroup:SetLooping("REPEAT")
 
@@ -140,11 +140,9 @@ function NovaApplyTheme(name)
     NovaFrame:SetBackdropBorderColor(t[4], t[5], t[6], 1)
     NovaHeader:SetVertexColor(t[4], t[5], t[6], 1)
 
-    -- Update unique creature emblem texture
     leftCorner:SetTexture(t[8])
     rightCorner:SetTexture(t[8])
 
-    -- Tint emblems to match theme accent color
     leftCorner:SetVertexColor(t[4], t[5], t[6], 1)
     rightCorner:SetVertexColor(t[4], t[5], t[6], 1)
 end
@@ -247,7 +245,7 @@ function NovaSortBagsPhysical()
     end
 
     table.sort(targetOrder, function(a, b)
-        if a.hasItem ~= b.hasItem me
+        if a.hasItem ~= b.hasItem then
             return a.hasItem and not b.hasItem
         end
         if not a.hasItem and not b.hasItem then
