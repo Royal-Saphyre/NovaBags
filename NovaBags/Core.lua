@@ -5,7 +5,6 @@
 
 local SPACING = 36
 local COLUMNS = 10
-local TOTAL_SLOTS = 100
 
 
 ------------------------------------------------
@@ -13,87 +12,84 @@ local TOTAL_SLOTS = 100
 ------------------------------------------------
 
 NovaFrame = CreateFrame(
-    "Frame",
-    "NovaMainFrame",
-    UIParent
+"Frame",
+"NovaMainFrame",
+UIParent
 )
 
 
 NovaFrame:SetSize(
-    410,
-    430
+410,
+430
 )
 
 
--- right side bag position
 NovaFrame:SetPoint(
-    "RIGHT",
-    UIParent,
-    "RIGHT",
-    -120,
-    0
+"RIGHT",
+UIParent,
+"RIGHT",
+-120,
+0
 )
 
 
 NovaFrame:SetBackdrop({
 
-    bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
+bgFile =
+"Interface\\Tooltips\\UI-Tooltip-Background",
 
-    edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
+edgeFile =
+"Interface\\Tooltips\\UI-Tooltip-Border",
 
-    edgeSize = 16,
+edgeSize = 16,
 
-    insets = {
-        left = 5,
-        right = 5,
-        top = 5,
-        bottom = 5
-    }
+insets =
+{
+left=5,
+right=5,
+top=5,
+bottom=5
+}
 
 })
 
 
 NovaFrame:SetBackdropColor(
-    0.02,
-    0.02,
-    0.02,
-    0.95
+0.02,
+0.02,
+0.02,
+0.95
 )
 
 
 NovaFrame:SetBackdropBorderColor(
-    0.85,
-    0.65,
-    0.15,
-    1
+0.85,
+0.65,
+0.15,
+1
 )
 
 
 
 NovaFrame:SetMovable(true)
 NovaFrame:EnableMouse(true)
-
-NovaFrame:RegisterForDrag(
-    "LeftButton"
-)
+NovaFrame:RegisterForDrag("LeftButton")
 
 
 NovaFrame:SetScript(
 "OnDragStart",
 function(self)
-
 self:StartMoving()
-
-end)
+end
+)
 
 
 NovaFrame:SetScript(
 "OnDragStop",
 function(self)
-
 self:StopMovingOrSizing()
-
-end)
+end
+)
 
 
 NovaFrame:Hide()
@@ -133,6 +129,37 @@ NovaHeader = header
 
 
 
+local logo =
+NovaFrame:CreateTexture(
+nil,
+"OVERLAY"
+)
+
+
+logo:SetTexture(
+"Interface\\Icons\\INV_Misc_Orb_05"
+)
+
+
+logo:SetSize(
+38,
+38
+)
+
+
+logo:SetPoint(
+"LEFT",
+header,
+"LEFT",
+35,
+0
+)
+
+
+NovaLogo = logo
+
+
+
 local title =
 NovaFrame:CreateFontString(
 nil,
@@ -157,7 +184,7 @@ title:SetText(
 
 
 ------------------------------------------------
--- Close button
+-- Close
 ------------------------------------------------
 
 local close =
@@ -179,10 +206,9 @@ close:SetPoint(
 close:SetScript(
 "OnClick",
 function()
-
 NovaFrame:Hide()
-
-end)
+end
+)
 
 
 
@@ -190,31 +216,46 @@ end)
 -- Themes
 ------------------------------------------------
 
-NovaThemes = {
+NovaThemes =
+{
 
-Default = {
+Default =
+{
 0.1,0.1,0.1,
-0.7,0.7,0.7
+0.7,0.7,0.7,
+"Interface\\Icons\\INV_Misc_QuestionMark"
 },
 
-ObsidianGold = {
+
+ObsidianGold =
+{
 0.02,0.02,0.02,
-0.85,0.65,0.15
+0.85,0.65,0.15,
+"Interface\\Icons\\INV_Ingot_05"
 },
 
-Shadow = {
+
+Shadow =
+{
 0.04,0.03,0.06,
-0.4,0.2,0.8
+0.5,0.2,0.8,
+"Interface\\Icons\\Spell_Shadow_Shadesofdark"
 },
 
-Arcane = {
+
+Arcane =
+{
 0.08,0.02,0.15,
-0.5,0.3,1
+0.5,0.3,1,
+"Interface\\Icons\\Spell_Arcane_Arcane01"
 },
 
-Nature = {
+
+Nature =
+{
 0.02,0.12,0.04,
-0.3,0.8,0.3
+0.3,0.8,0.3,
+"Interface\\Icons\\Spell_Nature_NatureBlessing"
 }
 
 }
@@ -229,7 +270,6 @@ NovaThemes[name]
 
 
 if not t then return end
-
 
 
 NovaFrame:SetBackdropColor(
@@ -260,11 +300,9 @@ end
 
 
 
-------------------------------------------------
--- Theme buttons
-------------------------------------------------
 
-local themeList = {
+local themeOrder =
+{
 "Default",
 "ObsidianGold",
 "Shadow",
@@ -274,7 +312,7 @@ local themeList = {
 
 
 
-for i,name in ipairs(themeList) do
+for i,name in ipairs(themeOrder) do
 
 
 local b =
@@ -293,26 +331,22 @@ b:SetSize(
 
 b:SetPoint(
 "TOPRIGHT",
--20-(i*25),
+-15-(i*25),
 -15
 )
 
 
-
 b:SetNormalTexture(
-"Interface\\Icons\\INV_Misc_QuestionMark"
+NovaThemes[name][7]
 )
-
 
 
 b:SetScript(
 "OnClick",
 function()
-
 NovaApplyTheme(name)
-
-end)
-
+end
+)
 
 
 end
@@ -326,14 +360,17 @@ NovaApplyTheme(
 
 
 ------------------------------------------------
--- Item Slots
+-- Slots
 ------------------------------------------------
 
 NovaSlots = {}
 
 
 
-for i=1,TOTAL_SLOTS do
+function NovaCreateSlots(amount)
+
+
+for i=#NovaSlots+1,amount do
 
 
 local button =
@@ -345,18 +382,19 @@ i
 
 button:SetPoint(
 "TOPLEFT",
-20 + ((i-1)%COLUMNS)*SPACING,
--55 - math.floor((i-1)/COLUMNS)*SPACING
+20+((i-1)%COLUMNS)*SPACING,
+-55-math.floor((i-1)/COLUMNS)*SPACING
 )
-
-
-button:Hide()
 
 
 NovaSlots[i]=button
 
 
 end
+
+
+end
+
 
 
 
@@ -367,41 +405,54 @@ end
 function NovaDisplayItems()
 
 
-if not NovaScanBags then
-
-print("NovaBags: Missing scanner")
-return
-
-end
-
-
-
 NovaScanBags()
 
 
-print("Nova found:",#NovaInventory)
+
+local count =
+#NovaInventory
 
 
 
-for i=1,TOTAL_SLOTS do
+NovaCreateSlots(
+count
+)
 
 
-local button =
-NovaSlots[i]
+
+for i,button in ipairs(NovaSlots) do
 
 
 local item =
 NovaInventory[i]
 
 
-
 if item then
 
 
-NovaUpdateItemButton(
-button,
-item
+button.bagID =
+item.bagID
+
+
+button.slotID =
+item.slotID
+
+
+button.link =
+item.link
+
+
+button.icon:SetTexture(
+item.texture
 )
+
+
+button.count:SetText(
+item.count or ""
+)
+
+
+button:Show()
 
 
 else
@@ -453,23 +504,19 @@ scan:SetText(
 
 scan:SetScript(
 "OnClick",
-function()
-
-NovaDisplayItems()
-
-end)
+NovaDisplayItems
+)
 
 
 
 ------------------------------------------------
--- Slash command
+-- Slash
 ------------------------------------------------
 
 SLASH_NOVA1="/nova"
 
 
 SlashCmdList["NOVA"]=function()
-
 
 if NovaFrame:IsShown() then
 
@@ -482,6 +529,5 @@ NovaFrame:Show()
 NovaDisplayItems()
 
 end
-
 
 end
