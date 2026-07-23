@@ -11,8 +11,8 @@ local COLUMNS = 10
 ------------------------------------------------
 
 NovaFrame = CreateFrame("Frame", "NovaMainFrame", UIParent)
-NovaFrame:SetSize(410, 430)
-NovaFrame:SetPoint("RIGHT", UIParent, "RIGHT", -120, 0)
+NovaFrame:SetSize(400, 480)
+NovaFrame:SetPoint("CENTER", UIParent, "CENTER", 0, 0)
 
 NovaFrame:SetBackdrop({
     bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
@@ -104,11 +104,15 @@ function NovaCreateSlots(amount)
     for i = #NovaSlots + 1, amount do
         local button = NovaCreateItemButton(NovaFrame, i)
 
-        button:SetPoint(
-            "TOPLEFT",
-            20 + ((i - 1) % COLUMNS) * SPACING,
-            -55 - math.floor((i - 1) / COLUMNS) * SPACING
-        )
+        -- Properly padded Grid Calculation anchored inside NovaFrame
+        local col = (i - 1) % COLUMNS
+        local row = math.floor((i - 1) / COLUMNS)
+
+        local xPos = 20 + (col * SPACING)
+        local yPos = -55 - (row * SPACING)
+
+        button:ClearAllPoints()
+        button:SetPoint("TOPLEFT", NovaFrame, "TOPLEFT", xPos, yPos)
 
         NovaSlots[i] = button
     end
