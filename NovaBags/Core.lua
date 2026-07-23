@@ -43,16 +43,15 @@ header:SetSize(260, 50)
 header:SetPoint("TOP", 0, 10)
 NovaHeader = header
 
--- Star Icon near Title (Distinct from Starfire theme)
+local title = NovaFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+title:SetPoint("CENTER", header, "CENTER", 10, -2)
+title:SetText("NovaBags")
+
 local logo = NovaFrame:CreateTexture(nil, "OVERLAY")
 logo:SetTexture("Interface\\Icons\\Ability_Druid_Starfall")
-logo:SetSize(30, 30)
-logo:SetPoint("LEFT", header, "LEFT", 25, 0)
+logo:SetSize(22, 22)
+logo:SetPoint("RIGHT", title, "LEFT", -6, 0)
 NovaLogo = logo
-
-local title = NovaFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-title:SetPoint("CENTER", header, "CENTER", 0, 8)
-title:SetText("NovaBags")
 
 ------------------------------------------------
 -- Close Button
@@ -158,11 +157,17 @@ function NovaDisplayItems(sorted)
 
     if sorted then
         table.sort(NovaInventory, function(a, b)
-            if not a.link then return false end
-            if not b.link then return true end
+            -- Always push empty slots to the bottom
+            if a.hasItem ~= b.hasItem then
+                return a.hasItem and not b.hasItem
+            end
 
-            local _, _, qA = GetItemInfo(a.link)
-            local _, _, qB = GetItemInfo(b.link)
+            if not a.hasItem and not b.hasItem then
+                return false
+            end
+
+            local _, _, qA = GetItemInfo(a.link or "")
+            local _, _, qB = GetItemInfo(b.link or "")
 
             qA = qA or -1
             qB = qB or -1
@@ -196,6 +201,11 @@ function NovaDisplayItems(sorted)
             button.count:SetText(item.count)
             button:Show()
         else
+            button.bagID = nil
+            button.slotID = nil
+            button.link = nil
+            button.icon:SetTexture(nil)
+            button.count:SetText("")
             button:Hide()
         end
     end
