@@ -351,3 +351,55 @@ end
 
 
 end
+------------------------------------------------
+-- Blizzard bag opening hooks
+------------------------------------------------
+
+
+local oldToggleBackpack = ToggleBackpack
+
+
+function ToggleBackpack()
+
+
+    if NovaFrame:IsShown() then
+
+        NovaFrame:Hide()
+
+    else
+
+        NovaFrame:Show()
+
+        NovaScanBags()
+
+        NovaDisplayItems()
+
+    end
+
+
+end
+
+
+
+local oldOpenAllBags = OpenAllBags
+
+
+function OpenAllBags()
+
+
+    if NovaFrame:IsShown() then
+
+        NovaFrame:Hide()
+
+    else
+
+        NovaFrame:Show()
+
+        NovaScanBags()
+
+        NovaDisplayItems()
+
+    end
+
+
+end
