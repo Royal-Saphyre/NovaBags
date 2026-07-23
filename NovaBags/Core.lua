@@ -54,11 +54,12 @@ logo:SetPoint("RIGHT", title, "LEFT", -6, 0)
 NovaLogo = logo
 
 ------------------------------------------------
--- Close Button
+-- Close Button (Top-Right Above Emblem)
 ------------------------------------------------
 
 local close = CreateFrame("Button", nil, NovaFrame, "UIPanelCloseButton")
-close:SetPoint("TOPLEFT", header, "TOPLEFT", 18, -12)
+close:SetPoint("TOPRIGHT", NovaFrame, "TOPRIGHT", 5, 5)
+close:SetFrameLevel(NovaFrame:GetFrameLevel() + 10)
 close:SetScript("OnClick", function() NovaFrame:Hide() end)
 
 ------------------------------------------------
@@ -166,7 +167,6 @@ function NovaUpdateMoney()
     local silver = math.floor((totalCopper % 10000) / 100)
     local copper = totalCopper % 100
 
-    -- Correct WoW color formatting strings
     local str = ""
     if gold > 0 then
         str = str .. gold .. "|cffffd700g|r "
