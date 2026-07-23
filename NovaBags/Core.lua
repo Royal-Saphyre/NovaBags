@@ -20,9 +20,15 @@ NovaFrame = CreateFrame(
     UIParent
 )
 
-NovaFrame:SetSize(600, 450)
-NovaFrame:SetPoint("CENTER")
+NovaFrame:SetSize(360, 420)
 
+NovaFrame:SetPoint(
+    "RIGHT",
+    UIParent,
+    "RIGHT",
+    -40,
+    0
+)
 
 NovaFrame:SetBackdrop({
     bgFile = "Interface\\DialogFrame\\UI-DialogBox-Background",
