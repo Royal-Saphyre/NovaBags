@@ -1,91 +1,148 @@
---=============================================================================
--- NovaBags
--- File: ItemButton.lua
---
--- Creates Nova item buttons
---=============================================================================
-
--- Storage for all item buttons
 NovaItemButtons = {}
 
--- Create one item button
-function NovaCreateItemButton(parent, index)
 
-    local button = CreateFrame(
-        "Button",
-        "NovaItemButton"..index,
-        parent
-    )
+function NovaCreateItemButton(parent,index)
 
-    -- Size
-    button:SetSize(30, 30)
 
-    -- Icon
-    button.icon = button:CreateTexture(
-        nil,
-        "BACKGROUND"
-    )
+local button =
+CreateFrame(
+"Button",
+"NovaItemButton"..index,
+parent
+)
 
-    button.icon:SetAllPoints()
 
-    -- Count text
-    button.count = button:CreateFontString(
-        nil,
-        "OVERLAY"
-    )
+button:SetSize(
+30,
+30
+)
 
-    button.count:SetFont(
-        "Fonts\\FRIZQT__.TTF",
-        10,
-        "OUTLINE"
-    )
 
-    button.count:SetPoint(
-        "BOTTOMRIGHT",
-        -1,
-        1
-    )
 
-    -- Highlight effect
-    button:SetHighlightTexture(
-        "Interface\\Buttons\\ButtonHilight-Square"
-    )
+button.icon =
+button:CreateTexture(
+nil,
+"BACKGROUND"
+)
 
-    -- Tooltip
-    button:SetScript(
-        "OnEnter",
-        function(self)
 
-            if self.link then
+button.icon:SetAllPoints()
 
-                GameTooltip:SetOwner(
-                    self,
-                    "ANCHOR_RIGHT"
-                )
 
-                GameTooltip:SetHyperlink(
-                    self.link
-                )
 
-                GameTooltip:Show()
+button.count =
+button:CreateFontString(
+nil,
+"OVERLAY"
+)
 
-            end
 
-        end
-    )
+button.count:SetFont(
+"Fonts\\FRIZQT__.TTF",
+10,
+"OUTLINE"
+)
 
-    button:SetScript(
-        "OnLeave",
-        function()
 
-            GameTooltip:Hide()
+button.count:SetPoint(
+"BOTTOMRIGHT",
+-1,
+1
+)
 
-        end
-    )
 
-    -- Save reference
-    NovaItemButtons[index] = button
 
-    return button
+button:SetHighlightTexture(
+"Interface\\Buttons\\ButtonHilight-Square"
+)
+
+
+
+button:RegisterForClicks(
+"LeftButtonUp",
+"RightButtonUp"
+)
+
+
+
+button:SetScript(
+"OnClick",
+function(self,button)
+
+
+if not self.bagID then return end
+
+
+
+if button=="LeftButton" then
+
+
+PickupContainerItem(
+self.bagID,
+self.slotID
+)
+
+
+
+elseif button=="RightButton" then
+
+
+UseContainerItem(
+self.bagID,
+self.slotID
+)
+
+
+end
+
+
+end)
+
+
+
+button:SetScript(
+"OnEnter",
+function(self)
+
+
+if self.link then
+
+
+GameTooltip:SetOwner(
+self,
+"ANCHOR_RIGHT"
+)
+
+
+GameTooltip:SetHyperlink(
+self.link
+)
+
+
+GameTooltip:Show()
+
+
+end
+
+
+end)
+
+
+
+button:SetScript(
+"OnLeave",
+function()
+
+GameTooltip:Hide()
+
+end)
+
+
+
+NovaItemButtons[index]=button
+
+
+return button
+
 
 end
