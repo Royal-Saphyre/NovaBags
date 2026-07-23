@@ -34,7 +34,7 @@ NovaFrame:SetScript("OnDragStop", function(self) self:StopMovingOrSizing() end)
 NovaFrame:Hide()
 
 ------------------------------------------------
--- Header & Title (Fixed Position Inside Banner)
+-- Header & Title
 ------------------------------------------------
 
 local header = NovaFrame:CreateTexture(nil, "ARTWORK")
@@ -187,7 +187,7 @@ function NovaDisplayItems()
 end
 
 ------------------------------------------------
--- Real Physical Bag Sorting Engine
+-- Dynamic Physical Sorting Algorithm
 ------------------------------------------------
 
 local isSorting = false
@@ -198,13 +198,13 @@ function NovaSortBagsPhysical()
 
     NovaScanBags()
 
-    -- Map out ideal target positions
-    local sortedList = {}
+    -- Map out ideal target order
+    local targetOrder = {}
     for i, item in ipairs(NovaInventory) do
-        table.insert(sortedList, item)
+        table.insert(targetOrder, item)
     end
 
-    table.sort(sortedList, function(a, b)
+    table.sort(targetOrder, function(a, b)
         if a.hasItem ~= b.hasItem then
             return a.hasItem and not b.hasItem
         end
@@ -223,16 +223,35 @@ function NovaSortBagsPhysical()
         return (a.link or "") < (b.link or "")
     end)
 
-    -- Move items sequentially to physical target slots
-    local moves = 0
-    for i, targetItem in ipairs(sortedList) do
-        local currentSlot = NovaInventory[i]
-        if targetItem.hasItem and (targetItem.bagID ~= currentSlot.bagID or targetItem.slotID ~= currentSlot.slotID) then
-            PickupContainerItem(targetItem.bagID, targetItem.slotID)
-            PickupContainerItem(currentSlot.bagID, currentSlot.slotID)
-            moves = moves + 1
+    -- Dynamic physical pass
+    local currentLayout = {}
+    for i, item in ipairs(NovaInventory) do
+        currentLayout[i] = { bagID = item.bagID, slotID = item.slotID, link = item.link, hasItem = item.hasItem }
+    end
 
-            if moves > 8 then break end -- Process in chunks to prevent server throttle
+    for targetIndex, targetItem in ipairs(targetOrder) do
+        if targetItem.hasItem then
+            -- Find where targetItem currently lives in currentLayout
+            local currentPos = nil
+            for idx, liveItem in ipairs(currentLayout) do
+                if liveItem.bagID == targetItem.bagID and liveItem.slotID == targetItem.slotID then
+                    currentPos = idx
+                    break
+                end
+            end
+
+            -- If it's not already in the correct physical slot index
+            if currentPos and currentPos ~= targetIndex then
+                local destSlot = currentLayout[targetIndex]
+                local srcSlot = currentLayout[currentPos]
+
+                -- Execute physical WoW swap
+                PickupContainerItem(srcSlot.bagID, srcSlot.slotID)
+                PickupContainerItem(destSlot.bagID, destSlot.slotID)
+
+                -- Swap tracking locations internally
+                currentLayout[targetIndex], currentLayout[currentPos] = currentLayout[currentPos], currentLayout[targetIndex]
+            end
         end
     end
 
