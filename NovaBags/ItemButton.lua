@@ -3,7 +3,6 @@
 -- File: ItemButton.lua
 --=============================================================================
 
-
 NovaItemButtons = {}
 
 
@@ -18,6 +17,13 @@ function NovaCreateItemButton(parent,index)
 
 
     button:SetSize(30,30)
+
+
+
+    button:RegisterForClicks(
+        "LeftButtonUp",
+        "RightButtonUp"
+    )
 
 
 
@@ -60,64 +66,79 @@ function NovaCreateItemButton(parent,index)
 
 
 
+    ------------------------------------------------
+    -- Tooltip
+    ------------------------------------------------
+
     button:SetScript(
-        "OnEnter",
-        function(self)
+    "OnEnter",
+    function(self)
 
+        if self.link then
 
-            if self.link then
+            GameTooltip:SetOwner(
+                self,
+                "ANCHOR_RIGHT"
+            )
 
+            GameTooltip:SetHyperlink(
+                self.link
+            )
 
-                GameTooltip:SetOwner(
-                    self,
-                    "ANCHOR_RIGHT"
-                )
-
-
-                GameTooltip:SetHyperlink(
-                    self.link
-                )
-
-
-                GameTooltip:Show()
-
-
-            end
-
+            GameTooltip:Show()
 
         end
-    )
+
+    end)
 
 
 
     button:SetScript(
-        "OnLeave",
-        function()
+    "OnLeave",
+    function()
 
-            GameTooltip:Hide()
+        GameTooltip:Hide()
 
-        end
-    )
+    end)
 
 
+
+    ------------------------------------------------
+    -- Click behavior
+    ------------------------------------------------
 
     button:SetScript(
-        "OnClick",
-        function(self)
+    "OnClick",
+    function(self,mouse)
 
 
-            if self.link then
+        if not self.bagID then
+            return
+        end
 
-                PickupContainerItem(
-                    self.bagID,
-                    self.slotID
-                )
 
-            end
+        if mouse=="LeftButton" then
+
+
+            PickupContainerItem(
+                self.bagID,
+                self.slotID
+            )
+
+
+        elseif mouse=="RightButton" then
+
+
+            UseContainerItem(
+                self.bagID,
+                self.slotID
+            )
 
 
         end
-    )
+
+
+    end)
 
 
 
@@ -125,6 +146,5 @@ function NovaCreateItemButton(parent,index)
 
 
     return button
-
 
 end
