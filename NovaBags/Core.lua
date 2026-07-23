@@ -34,7 +34,36 @@ NovaFrame:SetScript("OnDragStop", function(self) self:StopMovingOrSizing() end)
 NovaFrame:Hide()
 
 ------------------------------------------------
--- Header & Title (Shifted Higher)
+-- Corner Emblems & Pulse VFX Animation
+------------------------------------------------
+
+local leftCorner = NovaFrame:CreateTexture(nil, "OVERLAY")
+leftCorner:SetSize(64, 64)
+leftCorner:SetPoint("TOPLEFT", NovaFrame, "TOPLEFT", -12, 12)
+
+local rightCorner = NovaFrame:CreateTexture(nil, "OVERLAY")
+rightCorner:SetSize(64, 64)
+rightCorner:SetPoint("TOPRIGHT", NovaFrame, "TOPRIGHT", 12, 12)
+rightCorner:SetTexCoord(1, 0, 0, 1) -- Flips right side horizontally
+
+-- Pulse Animation Group (VFX)
+local animGroup = NovaFrame:CreateAnimationGroup()
+animGroup:SetLooping("REPEAT")
+
+local fadeOut = animGroup:CreateAnimation("Alpha")
+fadeOut:SetChange(-0.35)
+fadeOut:SetDuration(1.2)
+fadeOut:SetOrder(1)
+
+local fadeIn = animGroup:CreateAnimation("Alpha")
+fadeIn:SetChange(0.35)
+fadeIn:SetDuration(1.2)
+fadeIn:SetOrder(2)
+
+animGroup:Play()
+
+------------------------------------------------
+-- Header & Title
 ------------------------------------------------
 
 local header = NovaFrame:CreateTexture(nil, "ARTWORK")
@@ -43,12 +72,10 @@ header:SetSize(260, 50)
 header:SetPoint("TOP", 0, 10)
 NovaHeader = header
 
--- Title moved higher (-10 instead of -18) to sit right in the header center
 local title = NovaFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
 title:SetPoint("TOP", header, "TOP", 10, -10)
 title:SetText("NovaBags")
 
--- Icon aligned with higher title
 local logo = NovaFrame:CreateTexture(nil, "OVERLAY")
 logo:SetTexture("Interface\\Icons\\Ability_Druid_Starfall")
 logo:SetSize(20, 20)
@@ -88,24 +115,37 @@ scrollFrame:SetScript("OnMouseWheel", function(self, delta)
 end)
 
 ------------------------------------------------
--- Themes
+-- Themes & Dynamic Corner Decorator
 ------------------------------------------------
 
+-- Texture references for creatures
+local TEXTURE_DRAGON  = "Interface\\MainMenuBar\\UI-MainMenuBar-EndCap-Dwarf"
+local TEXTURE_GRYPHON = "Interface\\MainMenuBar\\UI-MainMenuBar-EndCap-Human"
+
 NovaThemes = {
-    Default      = { 0.10, 0.10, 0.10, 0.70, 0.70, 0.70, "Interface\\Icons\\INV_Misc_QuestionMark" },
-    ObsidianGold = { 0.02, 0.02, 0.02, 0.85, 0.65, 0.15, "Interface\\Icons\\INV_Ingot_05" },
-    Shadow       = { 0.04, 0.03, 0.06, 0.50, 0.20, 0.80, "Interface\\Icons\\Spell_Shadow_Shadesofdark" },
-    Arcane       = { 0.08, 0.02, 0.15, 0.50, 0.30, 1.00, "Interface\\Icons\\Spell_Arcane_Arcane01" },
-    Starfire     = { 0.02, 0.08, 0.18, 0.20, 0.60, 1.00, "Interface\\Icons\\Spell_Arcane_StarFire" }
+    Default      = { 0.10, 0.10, 0.10, 0.70, 0.70, 0.70, "Interface\\Icons\\INV_Misc_QuestionMark", TEXTURE_GRYPHON },
+    ObsidianGold = { 0.02, 0.02, 0.02, 0.85, 0.65, 0.15, "Interface\\Icons\\INV_Ingot_05",           TEXTURE_DRAGON },
+    Shadow       = { 0.04, 0.03, 0.06, 0.50, 0.20, 0.80, "Interface\\Icons\\Spell_Shadow_Shadesofdark", TEXTURE_GRYPHON },
+    Arcane       = { 0.08, 0.02, 0.15, 0.50, 0.30, 1.00, "Interface\\Icons\\Spell_Arcane_Arcane01",     TEXTURE_GRYPHON },
+    Starfire     = { 0.02, 0.08, 0.18, 0.20, 0.60, 1.00, "Interface\\Icons\\Spell_Arcane_StarFire",     TEXTURE_GRYPHON }
 }
 
 function NovaApplyTheme(name)
     local t = NovaThemes[name]
     if not t then return end
 
+    -- Frame and Header recoloring
     NovaFrame:SetBackdropColor(t[1], t[2], t[3], 0.95)
     NovaFrame:SetBackdropBorderColor(t[4], t[5], t[6], 1)
     NovaHeader:SetVertexColor(t[4], t[5], t[6], 1)
+
+    -- Set creature graphics (Dragon for ObsidianGold, Gryphon for rest)
+    leftCorner:SetTexture(t[8])
+    rightCorner:SetTexture(t[8])
+
+    -- Tint creature corners to match theme border colors
+    leftCorner:SetVertexColor(t[4], t[5], t[6], 1)
+    rightCorner:SetVertexColor(t[4], t[5], t[6], 1)
 end
 
 local themeOrder = { "Default", "ObsidianGold", "Shadow", "Arcane", "Starfire" }
@@ -189,7 +229,7 @@ function NovaDisplayItems()
 end
 
 ------------------------------------------------
--- Real Physical Bag Sorting Engine (With Forward Packing)
+-- Real Physical Bag Sorting Engine
 ------------------------------------------------
 
 local isSorting = false
@@ -200,7 +240,6 @@ function NovaSortBagsPhysical()
 
     NovaScanBags()
 
-    -- 1. Build sorted target list (putting all valid items first, empty slots last)
     local targetOrder = {}
     for i, item in ipairs(NovaInventory) do
         table.insert(targetOrder, item)
@@ -225,7 +264,6 @@ function NovaSortBagsPhysical()
         return (a.link or "") < (b.link or "")
     end)
 
-    -- 2. Track physical bag state
     local currentLayout = {}
     for i, item in ipairs(NovaInventory) do
         currentLayout[i] = {
@@ -236,7 +274,6 @@ function NovaSortBagsPhysical()
         }
     end
 
-    -- 3. Execute physical moves ensuring items move forward into early empty slots
     for targetIndex, targetItem in ipairs(targetOrder) do
         if targetItem.hasItem then
             local currentPos = nil
@@ -254,7 +291,6 @@ function NovaSortBagsPhysical()
                 PickupContainerItem(srcSlot.bagID, srcSlot.slotID)
                 PickupContainerItem(destSlot.bagID, destSlot.slotID)
 
-                -- Swap state pointers
                 currentLayout[targetIndex], currentLayout[currentPos] = currentLayout[currentPos], currentLayout[targetIndex]
             end
         end
