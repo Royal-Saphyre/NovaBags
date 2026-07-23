@@ -5,8 +5,6 @@
 -- Creates Nova item buttons
 --=============================================================================
 
-print("|cff00ff00ItemButton.lua LOADED|r")
-
 -- Storage for all item buttons
 NovaItemButtons = {}
 
@@ -37,7 +35,7 @@ function NovaCreateItemButton(parent, index)
     )
 
     button.count:SetFont(
-        "Fonts\\\\FRIZQT__.TTF",
+        "Fonts\\FRIZQT__.TTF",
         12,
         "OUTLINE"
     )
@@ -50,7 +48,7 @@ function NovaCreateItemButton(parent, index)
 
     -- Highlight effect
     button:SetHighlightTexture(
-        "Interface\\\\Buttons\\\\ButtonHilight-Square"
+        "Interface\\Buttons\\ButtonHilight-Square"
     )
 
     -- Tooltip
@@ -91,5 +89,3 @@ function NovaCreateItemButton(parent, index)
     return button
 
 end
-
-print("|cff00ff00Nova ItemButton system ready!|r")
