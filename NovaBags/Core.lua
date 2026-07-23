@@ -81,24 +81,22 @@ NovaFrame:RegisterForDrag(
 
 
 NovaFrame:SetScript(
-    "OnDragStart",
-    function(self)
+"OnDragStart",
+function(self)
 
-        self:StartMoving()
+    self:StartMoving()
 
-    end
-)
+end)
 
 
 
 NovaFrame:SetScript(
-    "OnDragStop",
-    function(self)
+"OnDragStop",
+function(self)
 
-        self:StopMovingOrSizing()
+    self:StopMovingOrSizing()
 
-    end
-)
+end)
 
 
 
@@ -195,7 +193,7 @@ close:SetScript(
 "OnClick",
 function()
 
-NovaFrame:Hide()
+    NovaFrame:Hide()
 
 end)
 
@@ -214,12 +212,10 @@ NovaFrame,
 )
 
 
-
 scanButton:SetSize(
 90,
 22
 )
-
 
 
 scanButton:SetPoint(
@@ -227,7 +223,6 @@ scanButton:SetPoint(
 15,
 -35
 )
-
 
 
 scanButton:SetText(
@@ -240,18 +235,16 @@ scanButton:SetScript(
 "OnClick",
 function()
 
+    NovaScanBags()
 
-NovaScanBags()
-
-NovaDisplayItems()
-
+    NovaDisplayItems()
 
 end)
 
 
 
 ---------------------------------------------------
--- Item Holder
+-- Item Container
 ---------------------------------------------------
 
 local holder =
@@ -341,7 +334,7 @@ function NovaDisplayItems()
 
 
 
-        if item.count > 1 then
+        if item.count and item.count > 1 then
 
 
             button.count:SetText(
@@ -374,12 +367,9 @@ function NovaDisplayItems()
 
     for i=index,#NovaItemButtons do
 
-
         NovaItemButtons[i]:Hide()
 
-
     end
-
 
 
 end
@@ -387,7 +377,7 @@ end
 
 
 ---------------------------------------------------
--- Open / Close Nova
+-- Toggle Nova
 ---------------------------------------------------
 
 function NovaToggle()
@@ -404,9 +394,7 @@ function NovaToggle()
 
         NovaFrame:Show()
 
-
         NovaScanBags()
-
 
         NovaDisplayItems()
 
@@ -429,6 +417,7 @@ function ToggleBackpack()
 end
 
 
+
 function OpenBackpack()
 
     NovaToggle()
@@ -436,11 +425,13 @@ function OpenBackpack()
 end
 
 
+
 function OpenAllBags()
 
     NovaToggle()
 
 end
+
 
 
 function ToggleAllBags()
@@ -452,79 +443,7 @@ end
 
 
 ---------------------------------------------------
--- Hook Blizzard Bag Buttons
----------------------------------------------------
-
-local hook =
-CreateFrame("Frame")
-
-
-hook:RegisterEvent(
-"PLAYER_LOGIN"
-)
-
-
-
-hook:SetScript(
-"OnEvent",
-function()
-
-
-
-for i = 0,4 do
-
-
-
-    local button =
-    _G["CharacterBag"..i.."Slot"]
-
-
-
-    if button then
-
-
-
-        button:SetScript(
-        "OnClick",
-        function()
-
-            NovaToggle()
-
-        end)
-
-
-
-    end
-
-
-
-end
-
-
-
-if MainMenuBarBackpackButton then
-
-
-    MainMenuBarBackpackButton:SetScript(
-    "OnClick",
-    function()
-
-        NovaToggle()
-
-    end)
-
-
-
-end
-
-
-
-end)
-
-
-
----------------------------------------------------
--- Auto Refresh
+-- Refresh when bags change
 ---------------------------------------------------
 
 local update =
@@ -542,15 +461,30 @@ update:SetScript(
 function()
 
 
+    if NovaFrame:IsShown() then
 
-if NovaFrame:IsShown() then
+        NovaScanBags()
 
+        NovaDisplayItems()
 
-    NovaDisplayItems()
-
-
-end
-
+    end
 
 
 end)
+
+
+
+---------------------------------------------------
+-- Slash Command
+---------------------------------------------------
+
+SLASH_NOVA1 = "/nova"
+
+
+
+SlashCmdList["NOVA"] =
+function()
+
+    NovaToggle()
+
+end
