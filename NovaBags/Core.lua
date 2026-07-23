@@ -34,35 +34,6 @@ NovaFrame:SetScript("OnDragStop", function(self) self:StopMovingOrSizing() end)
 NovaFrame:Hide()
 
 ------------------------------------------------
--- Corner Emblems & Pulse VFX Animation
-------------------------------------------------
-
-local leftCorner = NovaFrame:CreateTexture(nil, "OVERLAY")
-leftCorner:SetSize(64, 64)
-leftCorner:SetPoint("TOPLEFT", NovaFrame, "TOPLEFT", -12, 12)
-
-local rightCorner = NovaFrame:CreateTexture(nil, "OVERLAY")
-rightCorner:SetSize(64, 64)
-rightCorner:SetPoint("TOPRIGHT", NovaFrame, "TOPRIGHT", 12, 12)
-rightCorner:SetTexCoord(1, 0, 0, 1) -- Flips right side horizontally
-
--- Pulse Animation Group (VFX)
-local animGroup = NovaFrame:CreateAnimationGroup()
-animGroup:SetLooping("REPEAT")
-
-local fadeOut = animGroup:CreateAnimation("Alpha")
-fadeOut:SetChange(-0.35)
-fadeOut:SetDuration(1.2)
-fadeOut:SetOrder(1)
-
-local fadeIn = animGroup:CreateAnimation("Alpha")
-fadeIn:SetChange(0.35)
-fadeIn:SetDuration(1.2)
-fadeIn:SetOrder(2)
-
-animGroup:Play()
-
-------------------------------------------------
 -- Header & Title
 ------------------------------------------------
 
@@ -83,12 +54,41 @@ logo:SetPoint("RIGHT", title, "LEFT", -6, 0)
 NovaLogo = logo
 
 ------------------------------------------------
--- Close Button
+-- Close Button (Moved near Header Banner)
 ------------------------------------------------
 
 local close = CreateFrame("Button", nil, NovaFrame, "UIPanelCloseButton")
-close:SetPoint("TOPRIGHT", -5, -5)
+close:SetPoint("TOPLEFT", header, "TOPLEFT", 18, -12)
 close:SetScript("OnClick", function() NovaFrame:Hide() end)
+
+------------------------------------------------
+-- Corner Emblems (Moved Higher Above Item Slots)
+------------------------------------------------
+
+local leftCorner = NovaFrame:CreateTexture(nil, "OVERLAY")
+leftCorner:SetSize(54, 54)
+leftCorner:SetPoint("TOPLEFT", NovaFrame, "TOPLEFT", -10, 38)
+
+local rightCorner = NovaFrame:CreateTexture(nil, "OVERLAY")
+rightCorner:SetSize(54, 54)
+rightCorner:SetPoint("TOPRIGHT", NovaFrame, "TOPRIGHT", 10, 38)
+rightCorner:SetTexCoord(1, 0, 0, 1) -- Mirror right emblem
+
+-- Subtle Pulse Animation (VFX)
+local animGroup = NovaFrame:CreateAnimationGroup()
+animGroup:SetLooping("REPEAT")
+
+local fadeOut = animGroup:CreateAnimation("Alpha")
+fadeOut:SetChange(-0.30)
+fadeOut:SetDuration(1.2)
+fadeOut:SetOrder(1)
+
+local fadeIn = animGroup:CreateAnimation("Alpha")
+fadeIn:SetChange(0.30)
+fadeIn:SetDuration(1.2)
+fadeIn:SetOrder(2)
+
+animGroup:Play()
 
 ------------------------------------------------
 -- Scroll Container & Child Content Frame
@@ -115,35 +115,36 @@ scrollFrame:SetScript("OnMouseWheel", function(self, delta)
 end)
 
 ------------------------------------------------
--- Themes & Dynamic Corner Decorator
+-- Themes & Unique Creature Emblems
 ------------------------------------------------
 
--- Texture references for creatures
-local TEXTURE_DRAGON  = "Interface\\MainMenuBar\\UI-MainMenuBar-EndCap-Dwarf"
-local TEXTURE_GRYPHON = "Interface\\MainMenuBar\\UI-MainMenuBar-EndCap-Human"
+local EMBLEM_LION    = "Interface\\MainMenuBar\\UI-MainMenuBar-EndCap-Human"
+local EMBLEM_DRAGON  = "Interface\\MainMenuBar\\UI-MainMenuBar-EndCap-Dwarf"
+local EMBLEM_SERPENT = "Interface\\TargetingFrame\\UI-TargetingFrame-Elite"
+local EMBLEM_GRYPHON = "Interface\\TargetingFrame\\UI-TargetingFrame-Rare-Elite"
+local EMBLEM_WING    = "Interface\\TutorialFrame\\UI-TutorialFrame-LevelUp"
 
 NovaThemes = {
-    Default      = { 0.10, 0.10, 0.10, 0.70, 0.70, 0.70, "Interface\\Icons\\INV_Misc_QuestionMark", TEXTURE_GRYPHON },
-    ObsidianGold = { 0.02, 0.02, 0.02, 0.85, 0.65, 0.15, "Interface\\Icons\\INV_Ingot_05",           TEXTURE_DRAGON },
-    Shadow       = { 0.04, 0.03, 0.06, 0.50, 0.20, 0.80, "Interface\\Icons\\Spell_Shadow_Shadesofdark", TEXTURE_GRYPHON },
-    Arcane       = { 0.08, 0.02, 0.15, 0.50, 0.30, 1.00, "Interface\\Icons\\Spell_Arcane_Arcane01",     TEXTURE_GRYPHON },
-    Starfire     = { 0.02, 0.08, 0.18, 0.20, 0.60, 1.00, "Interface\\Icons\\Spell_Arcane_StarFire",     TEXTURE_GRYPHON }
+    Default      = { 0.10, 0.10, 0.10, 0.70, 0.70, 0.70, "Interface\\Icons\\INV_Misc_QuestionMark", EMBLEM_LION },
+    ObsidianGold = { 0.02, 0.02, 0.02, 0.85, 0.65, 0.15, "Interface\\Icons\\INV_Ingot_05",           EMBLEM_DRAGON },
+    Shadow       = { 0.04, 0.03, 0.06, 0.50, 0.20, 0.80, "Interface\\Icons\\Spell_Shadow_Shadesofdark", EMBLEM_SERPENT },
+    Arcane       = { 0.08, 0.02, 0.15, 0.50, 0.30, 1.00, "Interface\\Icons\\Spell_Arcane_Arcane01",     EMBLEM_GRYPHON },
+    Starfire     = { 0.02, 0.08, 0.18, 0.20, 0.60, 1.00, "Interface\\Icons\\Spell_Arcane_StarFire",     EMBLEM_WING }
 }
 
 function NovaApplyTheme(name)
     local t = NovaThemes[name]
     if not t then return end
 
-    -- Frame and Header recoloring
     NovaFrame:SetBackdropColor(t[1], t[2], t[3], 0.95)
     NovaFrame:SetBackdropBorderColor(t[4], t[5], t[6], 1)
     NovaHeader:SetVertexColor(t[4], t[5], t[6], 1)
 
-    -- Set creature graphics (Dragon for ObsidianGold, Gryphon for rest)
+    -- Update unique creature emblem texture
     leftCorner:SetTexture(t[8])
     rightCorner:SetTexture(t[8])
 
-    -- Tint creature corners to match theme border colors
+    -- Tint emblems to match theme accent color
     leftCorner:SetVertexColor(t[4], t[5], t[6], 1)
     rightCorner:SetVertexColor(t[4], t[5], t[6], 1)
 end
@@ -246,7 +247,7 @@ function NovaSortBagsPhysical()
     end
 
     table.sort(targetOrder, function(a, b)
-        if a.hasItem ~= b.hasItem then
+        if a.hasItem ~= b.hasItem me
             return a.hasItem and not b.hasItem
         end
         if not a.hasItem and not b.hasItem then
