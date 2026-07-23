@@ -10,36 +10,45 @@ function NovaCreateItemButton(parent, index)
     button:SetSize(32, 32)
     button:SetFrameLevel(parent:GetFrameLevel() + 2)
 
+    -- Background texture for empty slots
     local bg = button:CreateTexture(nil, "BACKGROUND")
     bg:SetAllPoints(button)
     bg:SetTexture("Interface\\PaperDoll\\UI-Backpack-EmptySlot")
 
+    -- Icon Texture
     local icon = button:CreateTexture(nil, "BORDER")
     icon:SetAllPoints(button)
     button.icon = icon
 
+    -- Stack Count
     local count = button:CreateFontString(nil, "OVERLAY", "NumberFontNormal")
     count:SetPoint("BOTTOMRIGHT", button, "BOTTOMRIGHT", -2, 2)
     count:SetJustifyH("RIGHT")
     button.count = count
 
+    -- Mouseover Highlight
     local hl = button:CreateTexture(nil, "HIGHLIGHT")
     hl:SetTexture("Interface\\Buttons\\ButtonHilight-Square")
     hl:SetAllPoints(button)
     button:SetHighlightTexture(hl)
 
+    -- Fixed Tooltip Display
     button:SetScript("OnEnter", function(self)
-        if self.bagID and self.slotID and self.link then
-            GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
-            GameTooltip:SetBagItem(self.bagID, self.slotID)
-            GameTooltip:Show()
+        if self.bagID and self.slotID then
+            local texture = GetContainerItemLink(self.bagID, self.slotID)
+            if texture then
+                GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+                GameTooltip:SetBagItem(self.bagID, self.slotID)
+                GameTooltip:Show()
+            end
         end
     end)
 
-    button:SetScript("OnLeave", function()
+    button:SetScript("OnLeave", function(self)
         GameTooltip:Hide()
     end)
 
+    -- Click & Drag Actions
     button:RegisterForClicks("LeftButtonUp", "RightButtonUp")
     button:SetScript("OnClick", function(self, btn)
         if self.bagID == nil or self.slotID == nil then return end
