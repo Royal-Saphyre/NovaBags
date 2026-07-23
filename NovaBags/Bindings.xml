@@ -1,0 +1,5 @@
+<Bindings>
+    <Binding name="TOGGLENOVA" category="NovaBags" header="NOVABAGS">
+        SlashCmdList["NOVA"]()
+    </Binding>
+</Bindings>
