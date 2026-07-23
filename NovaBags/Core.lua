@@ -10,257 +10,86 @@ local COLUMNS = 10
 -- Main Frame
 ------------------------------------------------
 
-NovaFrame = CreateFrame(
-    "Frame",
-    "NovaMainFrame",
-    UIParent
-)
-
-NovaFrame:SetSize(
-    410,
-    430
-)
-
-NovaFrame:SetPoint(
-    "RIGHT",
-    UIParent,
-    "RIGHT",
-    -120,
-    0
-)
+NovaFrame = CreateFrame("Frame", "NovaMainFrame", UIParent)
+NovaFrame:SetSize(410, 430)
+NovaFrame:SetPoint("RIGHT", UIParent, "RIGHT", -120, 0)
 
 NovaFrame:SetBackdrop({
     bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
     edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
     edgeSize = 16,
-    insets = {
-        left = 5,
-        right = 5,
-        top = 5,
-        bottom = 5
-    }
+    insets = { left = 5, right = 5, top = 5, bottom = 5 }
 })
 
-NovaFrame:SetBackdropColor(
-    0.02,
-    0.02,
-    0.02,
-    0.95
-)
-
-NovaFrame:SetBackdropBorderColor(
-    0.85,
-    0.65,
-    0.15,
-    1
-)
+NovaFrame:SetBackdropColor(0.02, 0.02, 0.02, 0.95)
+NovaFrame:SetBackdropBorderColor(0.85, 0.65, 0.15, 1)
 
 NovaFrame:SetMovable(true)
 NovaFrame:EnableMouse(true)
 NovaFrame:RegisterForDrag("LeftButton")
 
-NovaFrame:SetScript(
-    "OnDragStart",
-    function(self)
-        self:StartMoving()
-    end
-)
-
-NovaFrame:SetScript(
-    "OnDragStop",
-    function(self)
-        self:StopMovingOrSizing()
-    end
-)
+NovaFrame:SetScript("OnDragStart", function(self) self:StartMoving() end)
+NovaFrame:SetScript("OnDragStop", function(self) self:StopMovingOrSizing() end)
 
 NovaFrame:Hide()
 
 ------------------------------------------------
--- Header
+-- Header & Title
 ------------------------------------------------
 
-local header = NovaFrame:CreateTexture(
-    nil,
-    "ARTWORK"
-)
-
-header:SetTexture(
-    "Interface\\DialogFrame\\UI-DialogBox-Header"
-)
-
-header:SetSize(
-    300,
-    64
-)
-
-header:SetPoint(
-    "TOP",
-    0,
-    12
-)
-
+local header = NovaFrame:CreateTexture(nil, "ARTWORK")
+header:SetTexture("Interface\\DialogFrame\\UI-DialogBox-Header")
+header:SetSize(300, 64)
+header:SetPoint("TOP", 0, 12)
 NovaHeader = header
 
-local logo = NovaFrame:CreateTexture(
-    nil,
-    "OVERLAY"
-)
-
-logo:SetTexture(
-    "Interface\\Icons\\INV_Misc_Orb_05"
-)
-
-logo:SetSize(
-    38,
-    38
-)
-
-logo:SetPoint(
-    "LEFT",
-    header,
-    "LEFT",
-    35,
-    0
-)
-
+local logo = NovaFrame:CreateTexture(nil, "OVERLAY")
+logo:SetTexture("Interface\\Icons\\INV_Misc_Orb_05")
+logo:SetSize(38, 38)
+logo:SetPoint("LEFT", header, "LEFT", 35, 0)
 NovaLogo = logo
 
-local title = NovaFrame:CreateFontString(
-    nil,
-    "OVERLAY",
-    "GameFontNormalLarge"
-)
-
-title:SetPoint(
-    "CENTER",
-    header,
-    "CENTER",
-    0,
-    9
-)
-
-title:SetText(
-    "NovaBags"
-)
+local title = NovaFrame:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
+title:SetPoint("CENTER", header, "CENTER", 0, 9)
+title:SetText("NovaBags")
 
 ------------------------------------------------
 -- Close Button
 ------------------------------------------------
 
-local close = CreateFrame(
-    "Button",
-    nil,
-    NovaFrame,
-    "UIPanelCloseButton"
-)
-
-close:SetPoint(
-    "TOPRIGHT",
-    -5,
-    -5
-)
-
-close:SetScript(
-    "OnClick",
-    function()
-        NovaFrame:Hide()
-    end
-)
+local close = CreateFrame("Button", nil, NovaFrame, "UIPanelCloseButton")
+close:SetPoint("TOPRIGHT", -5, -5)
+close:SetScript("OnClick", function() NovaFrame:Hide() end)
 
 ------------------------------------------------
 -- Themes
 ------------------------------------------------
 
 NovaThemes = {
-    Default = {
-        0.1, 0.1, 0.1,
-        0.7, 0.7, 0.7,
-        "Interface\\Icons\\INV_Misc_QuestionMark"
-    },
-    ObsidianGold = {
-        0.02, 0.02, 0.02,
-        0.85, 0.65, 0.15,
-        "Interface\\Icons\\INV_Ingot_05"
-    },
-    Shadow = {
-        0.04, 0.03, 0.06,
-        0.5, 0.2, 0.8,
-        "Interface\\Icons\\Spell_Shadow_Shadesofdark"
-    },
-    Arcane = {
-        0.08, 0.02, 0.15,
-        0.5, 0.3, 1,
-        "Interface\\Icons\\Spell_Arcane_Arcane01"
-    },
-    Nature = {
-        0.02, 0.12, 0.04,
-        0.3, 0.8, 0.3,
-        "Interface\\Icons\\Spell_Nature_NatureBlessing"
-    }
+    Default = { 0.1, 0.1, 0.1, 0.7, 0.7, 0.7, "Interface\\Icons\\INV_Misc_QuestionMark" },
+    ObsidianGold = { 0.02, 0.02, 0.02, 0.85, 0.65, 0.15, "Interface\\Icons\\INV_Ingot_05" },
+    Shadow = { 0.04, 0.03, 0.06, 0.5, 0.2, 0.8, "Interface\\Icons\\Spell_Shadow_Shadesofdark" },
+    Arcane = { 0.08, 0.02, 0.15, 0.5, 0.3, 1, "Interface\\Icons\\Spell_Arcane_Arcane01" },
+    Nature = { 0.02, 0.12, 0.04, 0.3, 0.8, 0.3, "Interface\\Icons\\Spell_Nature_NatureBlessing" }
 }
 
 function NovaApplyTheme(name)
     local t = NovaThemes[name]
     if not t then return end
 
-    NovaFrame:SetBackdropColor(
-        t[1],
-        t[2],
-        t[3],
-        0.95
-    )
-
-    NovaFrame:SetBackdropBorderColor(
-        t[4],
-        t[5],
-        t[6],
-        1
-    )
-
-    NovaHeader:SetVertexColor(
-        t[4],
-        t[5],
-        t[6],
-        1
-    )
+    NovaFrame:SetBackdropColor(t[1], t[2], t[3], 0.95)
+    NovaFrame:SetBackdropBorderColor(t[4], t[5], t[6], 1)
+    NovaHeader:SetVertexColor(t[4], t[5], t[6], 1)
 end
 
-local themeOrder = {
-    "Default",
-    "ObsidianGold",
-    "Shadow",
-    "Arcane",
-    "Nature"
-}
+local themeOrder = { "Default", "ObsidianGold", "Shadow", "Arcane", "Nature" }
 
 for i, name in ipairs(themeOrder) do
-    local b = CreateFrame(
-        "Button",
-        nil,
-        NovaFrame
-    )
-
-    b:SetSize(
-        22,
-        22
-    )
-
-    b:SetPoint(
-        "TOPRIGHT",
-        -15 - (i * 25),
-        -15
-    )
-
-    b:SetNormalTexture(
-        NovaThemes[name][7]
-    )
-
-    b:SetScript(
-        "OnClick",
-        function()
-            NovaApplyTheme(name)
-        end
-    )
+    local b = CreateFrame("Button", nil, NovaFrame)
+    b:SetSize(22, 22)
+    b:SetPoint("TOPRIGHT", -15 - (i * 25), -15)
+    b:SetNormalTexture(NovaThemes[name][7])
+    b:SetScript("OnClick", function() NovaApplyTheme(name) end)
 end
 
 NovaApplyTheme("ObsidianGold")
@@ -273,10 +102,7 @@ NovaSlots = {}
 
 function NovaCreateSlots(amount)
     for i = #NovaSlots + 1, amount do
-        local button = NovaCreateItemButton(
-            NovaFrame,
-            i
-        )
+        local button = NovaCreateItemButton(NovaFrame, i)
 
         button:SetPoint(
             "TOPLEFT",
@@ -325,35 +151,14 @@ end
 -- Scan button
 ------------------------------------------------
 
-local scan = CreateFrame(
-    "Button",
-    nil,
-    NovaFrame,
-    "UIPanelButtonTemplate"
-)
-
-scan:SetSize(
-    80,
-    22
-)
-
-scan:SetPoint(
-    "BOTTOM",
-    0,
-    10
-)
-
-scan:SetText(
-    "Scan"
-)
-
-scan:SetScript(
-    "OnClick",
-    NovaDisplayItems
-)
+local scan = CreateFrame("Button", nil, NovaFrame, "UIPanelButtonTemplate")
+scan:SetSize(80, 22)
+scan:SetPoint("BOTTOM", 0, 10)
+scan:SetText("Scan")
+scan:SetScript("OnClick", NovaDisplayItems)
 
 ------------------------------------------------
--- Slash & Keybinding Command
+-- Slash Command
 ------------------------------------------------
 
 SLASH_NOVA1 = "/nova"
