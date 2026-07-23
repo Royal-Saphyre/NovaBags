@@ -1,61 +1,90 @@
 --=============================================================================
 -- NovaBags
 -- File: Core.lua
+--
+-- Main NovaBags window
 --=============================================================================
 
 
-NovaFrame =
-CreateFrame(
-"Frame",
-"NovaMainFrame",
-UIParent
+local ICON_SIZE = 32
+local SPACING = 36
+local COLUMNS = 10
+local TOTAL_SLOTS = 100
+
+
+------------------------------------------------
+-- Frame
+------------------------------------------------
+
+NovaFrame = CreateFrame(
+    "Frame",
+    "NovaMainFrame",
+    UIParent
 )
 
 
-
 NovaFrame:SetSize(
-400,
-420
+    410,
+    430
 )
 
 
 NovaFrame:SetPoint(
-"RIGHT",
-UIParent,
-"RIGHT",
--100,
-0
+    "RIGHT",
+    UIParent,
+    "RIGHT",
+    -120,
+    0
 )
 
 
 
 NovaFrame:SetBackdrop({
 
-bgFile =
-"Interface\\DialogFrame\\UI-DialogBox-Background",
+    bgFile =
+    "Interface\\Tooltips\\UI-Tooltip-Background",
 
-edgeFile =
-"Interface\\Tooltips\\UI-Tooltip-Border",
+    edgeFile =
+    "Interface\\Tooltips\\UI-Tooltip-Border",
 
-edgeSize = 16,
+    edgeSize = 16,
 
-insets={
-left=5,
-right=5,
-top=5,
-bottom=5
-}
+    insets = {
+        left=6,
+        right=6,
+        top=6,
+        bottom=6
+    }
 
 })
 
 
 
+NovaFrame:SetBackdropColor(
+    0.02,
+    0.02,
+    0.02,
+    0.95
+)
+
+
+NovaFrame:SetBackdropBorderColor(
+    0.85,
+    0.65,
+    0.15,
+    1
+)
+
+
+
 NovaFrame:SetMovable(true)
+
 NovaFrame:EnableMouse(true)
 
 NovaFrame:RegisterForDrag(
-"LeftButton"
+    "LeftButton"
 )
+
 
 
 NovaFrame:SetScript(
@@ -83,7 +112,7 @@ NovaFrame:Hide()
 
 
 ------------------------------------------------
--- HEADER
+-- Header
 ------------------------------------------------
 
 
@@ -117,7 +146,7 @@ local title =
 NovaFrame:CreateFontString(
 nil,
 "OVERLAY",
-"GameFontNormal"
+"GameFontNormalLarge"
 )
 
 
@@ -131,7 +160,6 @@ header,
 )
 
 
-
 title:SetText(
 "NovaBags"
 )
@@ -139,65 +167,252 @@ title:SetText(
 
 
 ------------------------------------------------
--- SCROLL AREA
+-- Theme buttons
 ------------------------------------------------
 
 
-local ICON_SIZE = 30
-local SPACING = 34
-local ROWS = 10
+local themes = {
+
+Default={
+0.1,0.1,0.1,1,
+0.7,0.7,0.7,1
+},
+
+ObsidianGold={
+0.02,0.02,0.02,1,
+0.85,0.65,0.15,1
+},
+
+Shadow={
+0.03,0.03,0.05,1,
+0.3,0.3,0.35,1
+},
+
+Arcane={
+0.08,0.02,0.15,1,
+0.6,0.2,1,1
+},
+
+Nature={
+0.02,0.12,0.04,1,
+0.3,0.8,0.3,1
+}
+
+}
 
 
 
-local scroll =
+local themeOrder = {
+
+"Default",
+"ObsidianGold",
+"Shadow",
+"Arcane",
+"Nature"
+
+}
+
+
+
+local function ApplyTheme(name)
+
+
+local t =
+themes[name]
+
+
+NovaFrame:SetBackdropColor(
+t[1],
+t[2],
+t[3],
+t[4]
+)
+
+
+NovaFrame:SetBackdropBorderColor(
+t[5],
+t[6],
+t[7],
+t[8]
+)
+
+
+end
+
+
+
+
+for i,name in ipairs(themeOrder) do
+
+
+local b =
 CreateFrame(
-"ScrollFrame",
-"NovaScrollFrame",
+"Button",
+nil,
+NovaFrame
+)
+
+
+b:SetSize(
+22,
+22
+)
+
+
+b:SetPoint(
+"TOPRIGHT",
+-20-(i*24),
+-12
+)
+
+
+
+b:SetNormalTexture(
+"Interface\\Icons\\INV_Misc_QuestionMark"
+)
+
+
+
+b:SetScript(
+"OnClick",
+function()
+
+ApplyTheme(name)
+
+end
+)
+
+
+
+b:SetScript(
+"OnEnter",
+function(self)
+
+GameTooltip:SetOwner(
+self,
+"ANCHOR_RIGHT"
+)
+
+GameTooltip:SetText(
+name
+)
+
+GameTooltip:Show()
+
+end
+)
+
+
+
+b:SetScript(
+"OnLeave",
+function()
+
+GameTooltip:Hide()
+
+end
+)
+
+
+
+end
+
+
+
+ApplyTheme(
+"ObsidianGold"
+)
+
+
+
+------------------------------------------------
+-- Slots
+------------------------------------------------
+
+
+NovaSlots = {}
+
+
+
+for i=1,TOTAL_SLOTS do
+
+
+local slot =
+NovaCreateItemButton(
 NovaFrame,
-"UIPanelScrollFrameTemplate"
+i
 )
 
 
-
-scroll:SetPoint(
+slot:SetPoint(
 "TOPLEFT",
-15,
--45
-)
-
-
-scroll:SetPoint(
-"BOTTOMRIGHT",
--30,
-15
+20 + ((i-1)%COLUMNS)*SPACING,
+-55 - math.floor((i-1)/COLUMNS)*SPACING
 )
 
 
 
-local child =
-CreateFrame(
-"Frame",
-"NovaScrollChild",
-scroll
-)
+NovaSlots[i]=slot
 
 
+end
 
-scroll:SetScrollChild(
-child
-)
-
-
-
-child:SetSize(
-350,
-350
-)
 
 
 
 ------------------------------------------------
--- SCAN BUTTON
+-- Display items
+------------------------------------------------
+
+
+function NovaDisplayItems()
+
+
+NovaScanBags()
+
+
+
+for i=1,TOTAL_SLOTS do
+
+
+local button =
+NovaSlots[i]
+
+
+local item =
+NovaInventory[i]
+
+
+if item then
+
+
+NovaUpdateItemButton(
+button,
+item
+)
+
+
+else
+
+
+button:Hide()
+
+
+end
+
+
+
+end
+
+
+
+end
+
+
+
+
+------------------------------------------------
+-- Scan button
 ------------------------------------------------
 
 
@@ -210,20 +425,17 @@ NovaFrame,
 )
 
 
-
 scan:SetSize(
-90,
-25
+80,
+22
 )
-
 
 
 scan:SetPoint(
-"BOTTOMLEFT",
-15,
+"BOTTOM",
+0,
 10
 )
-
 
 
 scan:SetText(
@@ -237,8 +449,6 @@ scan:SetScript(
 function()
 
 
-NovaScanBags()
-
 NovaDisplayItems()
 
 
@@ -247,85 +457,9 @@ end
 
 
 
-------------------------------------------------
--- DISPLAY ITEMS
-------------------------------------------------
-
-
-function NovaDisplayItems()
-
-
-
-for i,item in ipairs(NovaInventory) do
-
-
-
-local button =
-NovaItemButtons[i]
-
-
-
-if not button then
-
-
-button =
-NovaCreateItemButton(
-child,
-i
-)
-
-
-end
-
-
-
-button:SetPoint(
-"TOPLEFT",
-((i-1)%ROWS)*SPACING,
--math.floor((i-1)/ROWS)*SPACING
-)
-
-
-
-button.icon:SetTexture(
-item.texture or
-"Interface\\Icons\\INV_Misc_QuestionMark"
-)
-
-
-
-button.count:SetText(
-item.count
-)
-
-
-button.link =
-item.link
-
-
-button.bagID =
-item.bagID
-
-
-button.slotID =
-item.slotID
-
-
-
-button:Show()
-
-
-
-end
-
-
-
-end
-
-
 
 ------------------------------------------------
--- SLASH COMMAND
+-- Slash
 ------------------------------------------------
 
 
@@ -337,69 +471,53 @@ SlashCmdList["NOVA"]=function()
 
 if NovaFrame:IsShown() then
 
+
+NovaFrame:Hide()
+
+
+else
+
+
+NovaFrame:Show()
+
+NovaDisplayItems()
+
+
+end
+
+
+end
+
+
+
+
+------------------------------------------------
+-- Safe bag hooks
+------------------------------------------------
+
+
+function ToggleBackpack()
+
+
+if NovaFrame:IsShown() then
+
 NovaFrame:Hide()
 
 else
 
 NovaFrame:Show()
 
-NovaScanBags()
-
 NovaDisplayItems()
 
 end
 
-
-end
-------------------------------------------------
--- Blizzard bag opening hooks
-------------------------------------------------
-
-
-local oldToggleBackpack = ToggleBackpack
-
-
-function ToggleBackpack()
-
-
-    if NovaFrame:IsShown() then
-
-        NovaFrame:Hide()
-
-    else
-
-        NovaFrame:Show()
-
-        NovaScanBags()
-
-        NovaDisplayItems()
-
-    end
-
-
 end
 
-
-
-local oldOpenAllBags = OpenAllBags
 
 
 function OpenAllBags()
 
 
-    if NovaFrame:IsShown() then
-
-        NovaFrame:Hide()
-
-    else
-
-        NovaFrame:Show()
-
-        NovaScanBags()
-
-        NovaDisplayItems()
-
-    end
-
+ToggleBackpack()
 
 end
