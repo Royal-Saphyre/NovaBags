@@ -1,68 +1,68 @@
 --=============================================================================
 -- NovaBags
 -- File: ItemButton.lua
+--
+-- Real WoW container-style item buttons
 --=============================================================================
 
 NovaItemButtons = {}
 
 
-function NovaCreateItemButton(parent,index)
+local ITEM_SIZE = 30
+
+
+function NovaCreateItemButton(parent, index)
 
 
     local button = CreateFrame(
         "Button",
         "NovaItemButton"..index,
-        parent
+        parent,
+        "ContainerFrameItemButtonTemplate"
     )
 
 
-    button:SetSize(30,30)
-
-
-
-    button:RegisterForClicks(
-        "LeftButtonUp",
-        "RightButtonUp"
+    button:SetSize(
+        ITEM_SIZE,
+        ITEM_SIZE
     )
 
 
-
-    button.icon =
-    button:CreateTexture(
-        nil,
-        "BACKGROUND"
-    )
-
-
-    button.icon:SetAllPoints()
+    button:SetID(index)
 
 
 
-    button.count =
-    button:CreateFontString(
-        nil,
-        "OVERLAY"
-    )
-
-
-    button.count:SetFont(
-        "Fonts\\FRIZQT__.TTF",
-        10,
-        "OUTLINE"
-    )
-
-
-    button.count:SetPoint(
-        "BOTTOMRIGHT",
-        -1,
-        1
-    )
+    -- store reference
+    NovaItemButtons[index] = button
 
 
 
-    button:SetHighlightTexture(
-        "Interface\\Buttons\\ButtonHilight-Square"
-    )
+    ------------------------------------------------
+    -- Count text
+    ------------------------------------------------
+
+    if not button.Count then
+
+        button.Count =
+        button:CreateFontString(
+            nil,
+            "OVERLAY"
+        )
+
+        button.Count:SetFont(
+            "Fonts\\FRIZQT__.TTF",
+            10,
+            "OUTLINE"
+        )
+
+
+        button.Count:SetPoint(
+            "BOTTOMRIGHT",
+            -2,
+            2
+        )
+
+    end
 
 
 
@@ -71,80 +71,140 @@ function NovaCreateItemButton(parent,index)
     ------------------------------------------------
 
     button:SetScript(
-    "OnEnter",
-    function(self)
+        "OnEnter",
+        function(self)
 
-        if self.link then
 
-            GameTooltip:SetOwner(
-                self,
-                "ANCHOR_RIGHT"
-            )
+            if self.link then
 
-            GameTooltip:SetHyperlink(
-                self.link
-            )
 
-            GameTooltip:Show()
+                GameTooltip:SetOwner(
+                    self,
+                    "ANCHOR_RIGHT"
+                )
+
+
+                GameTooltip:SetHyperlink(
+                    self.link
+                )
+
+
+                GameTooltip:Show()
+
+
+            end
+
 
         end
-
-    end)
+    )
 
 
 
     button:SetScript(
-    "OnLeave",
-    function()
+        "OnLeave",
+        function()
 
-        GameTooltip:Hide()
 
-    end)
+            GameTooltip:Hide()
+
+
+        end
+    )
 
 
 
     ------------------------------------------------
-    -- Click behavior
+    -- Click handling
     ------------------------------------------------
+
+    button:RegisterForClicks(
+        "LeftButtonUp",
+        "RightButtonUp"
+    )
+
 
     button:SetScript(
-    "OnClick",
-    function(self,mouse)
+        "OnClick",
+        function(self, buttonName)
 
 
-        if not self.bagID then
-            return
+            if not self.bagID then
+                return
+            end
+
+
+
+            if buttonName == "LeftButton" then
+
+
+                PickupContainerItem(
+                    self.bagID,
+                    self.slotID
+                )
+
+
+
+            elseif buttonName == "RightButton" then
+
+
+                UseContainerItem(
+                    self.bagID,
+                    self.slotID
+                )
+
+
+            end
+
+
         end
+    )
 
-
-        if mouse=="LeftButton" then
-
-
-            PickupContainerItem(
-                self.bagID,
-                self.slotID
-            )
-
-
-        elseif mouse=="RightButton" then
-
-
-            UseContainerItem(
-                self.bagID,
-                self.slotID
-            )
-
-
-        end
-
-
-    end)
-
-
-
-    NovaItemButtons[index]=button
 
 
     return button
+
+end
+
+
+
+------------------------------------------------
+-- Update item button
+------------------------------------------------
+
+function NovaUpdateItemButton(button, item)
+
+
+    button.bagID =
+    item.bagID
+
+
+    button.slotID =
+    item.slotID
+
+
+    button.link =
+    item.link
+
+
+
+    button.icon:SetTexture(
+        item.texture or
+        "Interface\\Icons\\INV_Misc_QuestionMark"
+    )
+
+
+
+    if button.Count then
+
+        button.Count:SetText(
+            item.count or 1
+        )
+
+    end
+
+
+
+    button:Show()
+
 
 end
