@@ -1,7 +1,10 @@
 --=============================================================================
 -- NovaBags
 -- File: Core.lua
+--
+-- Main NovaBags window
 --=============================================================================
+
 
 NovaFrame = CreateFrame(
     "Frame",
@@ -10,10 +13,12 @@ NovaFrame = CreateFrame(
 )
 
 
+
 NovaFrame:SetSize(
     360,
     420
 )
+
 
 
 NovaFrame:SetPoint(
@@ -23,6 +28,7 @@ NovaFrame:SetPoint(
     -40,
     0
 )
+
 
 
 NovaFrame:SetBackdrop({
@@ -53,6 +59,7 @@ NovaFrame:RegisterForDrag(
 )
 
 
+
 NovaFrame:SetScript(
     "OnDragStart",
     function(self)
@@ -61,6 +68,7 @@ NovaFrame:SetScript(
 
     end
 )
+
 
 
 NovaFrame:SetScript(
@@ -82,266 +90,284 @@ NovaFrame:Hide()
 -- Header
 ---------------------------------------------------
 
-local header = NovaFrame:CreateTexture(
-    nil,
-    "ARTWORK"
+local header =
+NovaFrame:CreateTexture(
+nil,
+"ARTWORK"
 )
 
 
 header:SetTexture(
-    "Interface\\DialogFrame\\UI-DialogBox-Header"
+"Interface\\DialogFrame\\UI-DialogBox-Header"
 )
 
 
 header:SetSize(
-    300,
-    64
+300,
+64
 )
 
 
 header:SetPoint(
-    "TOP",
-    NovaFrame,
-    "TOP",
-    0,
-    12
+"TOP",
+NovaFrame,
+"TOP",
+0,
+12
 )
 
 
 
-local title = NovaFrame:CreateFontString(
-    nil,
-    "OVERLAY",
-    "GameFontNormal"
+local title =
+NovaFrame:CreateFontString(
+nil,
+"OVERLAY",
+"GameFontNormal"
 )
 
 
 title:SetPoint(
-    "TOP",
-    header,
-    "TOP",
-    0,
-    -14
+"TOP",
+header,
+"TOP",
+0,
+-14
 )
 
 
 title:SetText(
-    "NovaBags"
+"NovaBags"
 )
 
 
 
 ---------------------------------------------------
--- Close button
+-- Close
 ---------------------------------------------------
 
-local close = CreateFrame(
-    "Button",
-    nil,
-    NovaFrame,
-    "UIPanelCloseButton"
+local close =
+CreateFrame(
+"Button",
+nil,
+NovaFrame,
+"UIPanelCloseButton"
 )
 
 
 close:SetPoint(
-    "TOPRIGHT",
-    -2,
-    -6
+"TOPRIGHT",
+-2,
+-6
 )
+
 
 
 close:SetScript(
-    "OnClick",
-    function()
+"OnClick",
+function()
 
-        NovaFrame:Hide()
+NovaFrame:Hide()
 
-    end
-)
-
-
-
----------------------------------------------------
--- Bag Grid
----------------------------------------------------
-
-local ICON_SIZE = 30
-local SPACING = 34
-local PER_ROW = 10
-
-
-local container = CreateFrame(
-    "Frame",
-    nil,
-    NovaFrame
-)
-
-
-container:SetPoint(
-    "TOPLEFT",
-    20,
-    -45
-)
+end)
 
 
 
 ---------------------------------------------------
--- Display Bags
+-- Item area
+---------------------------------------------------
+
+local holder =
+CreateFrame(
+"Frame",
+nil,
+NovaFrame
+)
+
+
+holder:SetPoint(
+"TOPLEFT",
+20,
+-50
+)
+
+
+
+local SIZE = 30
+local SPACE = 34
+local ROWS = 10
+
+
+
+---------------------------------------------------
+-- Display
 ---------------------------------------------------
 
 function NovaDisplayItems()
 
 
-    NovaScanBags()
+NovaScanBags()
 
 
 
-    for i,slot in ipairs(NovaInventory) do
+for i,item in ipairs(NovaInventory) do
 
 
 
-        local button =
-        NovaItemButtons[i]
+local button =
+NovaItemButtons[i]
 
 
 
-        if not button then
-
-            button =
-            NovaCreateItemButton(
-                container,
-                i
-            )
-
-        end
+if not button then
 
 
-
-        button:SetPoint(
-            "TOPLEFT",
-            ((i-1)%PER_ROW)*SPACING,
-            -math.floor((i-1)/PER_ROW)*SPACING
-        )
-
-
-
-        button.bagID =
-        slot.bagID
-
-
-        button.slotID =
-        slot.slotID
-
-
-
-        button.link =
-        slot.link
-
-
-
-        local _,_,_,_,_,_,_,_,_,icon =
-        GetContainerItemInfo(
-            slot.bagID,
-            slot.slotID
-        )
-
-
-
-        button.icon:SetTexture(
-            icon or
-            "Interface\\Icons\\INV_Misc_QuestionMark"
-        )
-
-
-
-        if slot.count > 1 then
-
-            button.count:SetText(
-                slot.count
-            )
-
-        else
-
-            button.count:SetText("")
-
-        end
-
-
-
-        button:Show()
-
-    end
-
-end
-
-
-
-
-
----------------------------------------------------
--- Replace Blizzard bags
----------------------------------------------------
-
-function ToggleBackpack()
-
-
-    if NovaFrame:IsShown() then
-
-        NovaFrame:Hide()
-
-    else
-
-        NovaFrame:Show()
-
-        NovaDisplayItems()
-
-    end
-
-end
-
-
-
-
----------------------------------------------------
--- Hide Blizzard bag buttons
----------------------------------------------------
-
-local hide = CreateFrame("Frame")
-
-
-hide:RegisterEvent(
-"PLAYER_LOGIN"
+button =
+NovaCreateItemButton(
+holder,
+i
 )
 
 
-hide:SetScript(
+end
+
+
+
+button:SetPoint(
+"TOPLEFT",
+((i-1)%ROWS)*SPACE,
+-math.floor((i-1)/ROWS)*SPACE
+)
+
+
+
+button.bagID =
+item.bagID
+
+
+button.slotID =
+item.slotID
+
+
+button.link =
+item.link
+
+
+
+button.icon:SetTexture(
+item.texture
+or
+"Interface\\Icons\\INV_Misc_QuestionMark"
+)
+
+
+
+if item.count > 1 then
+
+button.count:SetText(
+item.count
+)
+
+else
+
+button.count:SetText("")
+
+end
+
+
+
+button:Show()
+
+
+
+end
+
+
+
+end
+
+
+
+---------------------------------------------------
+-- Replace Blizzard opening
+---------------------------------------------------
+
+function NovaToggle()
+
+
+if NovaFrame:IsShown() then
+
+
+NovaFrame:Hide()
+
+
+else
+
+
+NovaFrame:Show()
+
+NovaDisplayItems()
+
+
+end
+
+
+end
+
+
+
+function ToggleBackpack()
+
+NovaToggle()
+
+end
+
+
+function OpenBackpack()
+
+NovaToggle()
+
+end
+
+
+function OpenAllBags()
+
+NovaToggle()
+
+end
+
+
+function ToggleAllBags()
+
+NovaToggle()
+
+end
+
+
+
+---------------------------------------------------
+-- Update when bags change
+---------------------------------------------------
+
+local event =
+CreateFrame("Frame")
+
+
+event:RegisterEvent(
+"BAG_UPDATE"
+)
+
+
+
+event:SetScript(
 "OnEvent",
 function()
 
 
-    if MainMenuBarBackpackButton then
+if NovaFrame:IsShown() then
 
-        MainMenuBarBackpackButton:Hide()
+NovaDisplayItems()
 
-    end
-
-
-
-    for i=0,NUM_BAG_SLOTS do
-
-
-        local b =
-        _G["CharacterBag"..i.."Slot"]
-
-
-        if b then
-
-            b:Hide()
-
-        end
-
-
-    end
+end
 
 
 end)
@@ -358,8 +384,6 @@ SLASH_NOVA1="/nova"
 SlashCmdList["NOVA"] =
 function()
 
-
-    ToggleBackpack()
-
+NovaToggle()
 
 end
