@@ -2,7 +2,7 @@
 ## Title: NovaBags
 ## Author: Royal-Saphyre
 ## Version: 0.1.2
-## Notes: A modern bag addon for WoW 3.3.5a
+## Notes: A modern bag addon made for WoW 3.3.5a with style.
 
 NovaBags.lua
 BagScanner.lua
