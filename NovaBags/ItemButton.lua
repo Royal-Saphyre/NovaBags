@@ -47,8 +47,6 @@ function NovaCreateItemButton(parent, index)
         if btn == "RightButton" then
             UseContainerItem(self.bagID, self.slotID)
         else
-            -- Manual interaction disables forced sorting so items stay placed
-            NovaIsSorted = false
             PickupContainerItem(self.bagID, self.slotID)
         end
     end)
@@ -56,14 +54,12 @@ function NovaCreateItemButton(parent, index)
     button:RegisterForDrag("LeftButton")
     button:SetScript("OnDragStart", function(self)
         if self.bagID ~= nil and self.slotID ~= nil then
-            NovaIsSorted = false
             PickupContainerItem(self.bagID, self.slotID)
         end
     end)
 
     button:SetScript("OnReceiveDrag", function(self)
         if self.bagID ~= nil and self.slotID ~= nil then
-            NovaIsSorted = false
             PickupContainerItem(self.bagID, self.slotID)
         end
     end)
