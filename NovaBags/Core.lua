@@ -14,17 +14,16 @@ UIParent
 
 
 NovaFrame:SetSize(
-380,
+400,
 420
 )
-
 
 
 NovaFrame:SetPoint(
 "RIGHT",
 UIParent,
 "RIGHT",
--40,
+-100,
 0
 )
 
@@ -32,11 +31,13 @@ UIParent,
 
 NovaFrame:SetBackdrop({
 
-bgFile="Interface\\DialogFrame\\UI-DialogBox-Background",
+bgFile =
+"Interface\\DialogFrame\\UI-DialogBox-Background",
 
-edgeFile="Interface\\Tooltips\\UI-Tooltip-Border",
+edgeFile =
+"Interface\\Tooltips\\UI-Tooltip-Border",
 
-edgeSize=16,
+edgeSize = 16,
 
 insets={
 left=5,
@@ -50,13 +51,11 @@ bottom=5
 
 
 NovaFrame:SetMovable(true)
-
 NovaFrame:EnableMouse(true)
 
 NovaFrame:RegisterForDrag(
 "LeftButton"
 )
-
 
 
 NovaFrame:SetScript(
@@ -83,9 +82,10 @@ NovaFrame:Hide()
 
 
 
----------------------------------------------------
--- Header
----------------------------------------------------
+------------------------------------------------
+-- HEADER
+------------------------------------------------
+
 
 local header =
 NovaFrame:CreateTexture(
@@ -121,11 +121,15 @@ nil,
 )
 
 
+
 title:SetPoint(
-"TOP",
+"CENTER",
+header,
+"CENTER",
 0,
--14
+2
 )
+
 
 
 title:SetText(
@@ -134,9 +138,68 @@ title:SetText(
 
 
 
----------------------------------------------------
--- Scan Button
----------------------------------------------------
+------------------------------------------------
+-- SCROLL AREA
+------------------------------------------------
+
+
+local ICON_SIZE = 30
+local SPACING = 34
+local ROWS = 10
+
+
+
+local scroll =
+CreateFrame(
+"ScrollFrame",
+"NovaScrollFrame",
+NovaFrame,
+"UIPanelScrollFrameTemplate"
+)
+
+
+
+scroll:SetPoint(
+"TOPLEFT",
+15,
+-45
+)
+
+
+scroll:SetPoint(
+"BOTTOMRIGHT",
+-30,
+15
+)
+
+
+
+local child =
+CreateFrame(
+"Frame",
+"NovaScrollChild",
+scroll
+)
+
+
+
+scroll:SetScrollChild(
+child
+)
+
+
+
+child:SetSize(
+350,
+350
+)
+
+
+
+------------------------------------------------
+-- SCAN BUTTON
+------------------------------------------------
+
 
 local scan =
 CreateFrame(
@@ -150,15 +213,17 @@ NovaFrame,
 
 scan:SetSize(
 90,
-22
+25
 )
+
 
 
 scan:SetPoint(
-"TOPLEFT",
+"BOTTOMLEFT",
 15,
--35
+10
 )
+
 
 
 scan:SetText(
@@ -171,58 +236,32 @@ scan:SetScript(
 "OnClick",
 function()
 
+
 NovaScanBags()
 
 NovaDisplayItems()
 
-end)
 
-
-
----------------------------------------------------
--- Slot Holder
----------------------------------------------------
-
-local holder =
-CreateFrame(
-"Frame",
-nil,
-NovaFrame
-)
-
-
-holder:SetPoint(
-"TOPLEFT",
-20,
--70
+end
 )
 
 
 
-local SIZE = 38
+------------------------------------------------
+-- DISPLAY ITEMS
+------------------------------------------------
 
-local PERROW = 9
-
-
-
----------------------------------------------------
--- Display
----------------------------------------------------
 
 function NovaDisplayItems()
 
 
 
-local index=1
-
-
-
-for _,item in ipairs(NovaInventory) do
+for i,item in ipairs(NovaInventory) do
 
 
 
 local button =
-NovaItemButtons[index]
+NovaItemButtons[i]
 
 
 
@@ -231,8 +270,8 @@ if not button then
 
 button =
 NovaCreateItemButton(
-holder,
-index
+child,
+i
 )
 
 
@@ -242,41 +281,34 @@ end
 
 button:SetPoint(
 "TOPLEFT",
-((index-1)%PERROW)*SIZE,
--math.floor((index-1)/PERROW)*SIZE
+((i-1)%ROWS)*SPACING,
+-math.floor((i-1)/ROWS)*SPACING
 )
 
 
 
-button.bagID=item.bagID
-
-button.slotID=item.slotID
-
-button.link=item.link
-
-
-
 button.icon:SetTexture(
-item.texture
-or
+item.texture or
 "Interface\\Icons\\INV_Misc_QuestionMark"
 )
 
 
 
-if item.count>1 then
-
 button.count:SetText(
 item.count
 )
 
-else
 
-button.count:SetText(
-""
-)
+button.link =
+item.link
 
-end
+
+button.bagID =
+item.bagID
+
+
+button.slotID =
+item.slotID
 
 
 
@@ -284,18 +316,6 @@ button:Show()
 
 
 
-index=index+1
-
-
-
-end
-
-
-
-for i=index,#NovaItemButtons do
-
-NovaItemButtons[i]:Hide()
-
 end
 
 
@@ -304,12 +324,15 @@ end
 
 
 
----------------------------------------------------
--- Open / Close
----------------------------------------------------
+------------------------------------------------
+-- SLASH COMMAND
+------------------------------------------------
 
-function NovaToggle()
 
+SLASH_NOVA1="/nova"
+
+
+SlashCmdList["NOVA"]=function()
 
 
 if NovaFrame:IsShown() then
@@ -326,54 +349,5 @@ NovaDisplayItems()
 
 end
 
-
-
-end
-
-
-
----------------------------------------------------
--- Safe Blizzard replacements
----------------------------------------------------
-
-function ToggleBackpack()
-
-NovaToggle()
-
-end
-
-
-function OpenBackpack()
-
-NovaToggle()
-
-end
-
-
-function OpenAllBags()
-
-NovaToggle()
-
-end
-
-
-function ToggleAllBags()
-
-NovaToggle()
-
-end
-
-
-
----------------------------------------------------
--- Slash
----------------------------------------------------
-
-SLASH_NOVA1="/nova"
-
-
-SlashCmdList["NOVA"]=function()
-
-NovaToggle()
 
 end
