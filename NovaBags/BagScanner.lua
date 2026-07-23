@@ -13,24 +13,19 @@ function NovaScanBags()
     NovaInventory = {}
 
 
-    local total = 0
-
-
     for bag = 0,4 do
 
 
-        local slots = GetContainerNumSlots(bag)
-
-
-        print("Nova scanning bag:", bag, "slots:", slots)
-
-
-
-        for slot = 1, slots do
+        local slots =
+        GetContainerNumSlots(bag)
 
 
 
-            local texture, count =
+        for slot = 1,slots do
+
+
+
+            local texture,count =
             GetContainerItemInfo(
                 bag,
                 slot
@@ -47,22 +42,6 @@ function NovaScanBags()
 
 
             if link then
-
-
-
-                total = total + 1
-
-
-
-                print(
-                    "Nova found:",
-                    link,
-                    "Bag:",
-                    bag,
-                    "Slot:",
-                    slot
-                )
-
 
 
                 table.insert(
@@ -83,22 +62,13 @@ function NovaScanBags()
                 )
 
 
-
             end
-
 
 
         end
 
 
     end
-
-
-
-    print(
-        "|cff00ff00Nova scanned items:|r",
-        total
-    )
 
 
 end
