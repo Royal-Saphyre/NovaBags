@@ -5,11 +5,14 @@
 -- Scans player bags
 --=============================================================================
 
-print("|cff00ff00BagScanner.lua loaded|r")
-
 
 NovaInventory = {}
 
+
+
+------------------------------------------------
+-- Scan bags
+------------------------------------------------
 
 function NovaScanBags()
 
@@ -17,27 +20,31 @@ function NovaScanBags()
     wipe(NovaInventory)
 
 
+
     for bag = 0,4 do
 
 
-        local slots = GetContainerNumSlots(bag)
+        local slots =
+        GetContainerNumSlots(bag)
+
 
 
         for slot = 1, slots do
 
 
-            local texture, count, locked, quality =
+
+            local texture,
+            count,
+            locked,
+            quality,
+            readable,
+            lootable,
+            link =
             GetContainerItemInfo(
                 bag,
                 slot
             )
 
-
-            local link =
-            GetContainerItemLink(
-                bag,
-                slot
-            )
 
 
             if link then
@@ -57,6 +64,7 @@ function NovaScanBags()
 
                         texture = texture
 
+
                     }
                 )
 
@@ -71,3 +79,41 @@ function NovaScanBags()
 
 
 end
+
+
+
+
+------------------------------------------------
+-- Update when bags change
+------------------------------------------------
+
+
+local scanner =
+CreateFrame(
+"Frame"
+)
+
+
+
+scanner:RegisterEvent(
+"BAG_UPDATE"
+)
+
+
+
+scanner:SetScript(
+"OnEvent",
+function()
+
+
+if NovaFrame and NovaFrame:IsShown() then
+
+
+NovaDisplayItems()
+
+
+end
+
+
+end
+)
