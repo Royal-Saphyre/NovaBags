@@ -6,6 +6,9 @@
 local SPACING = 36
 local COLUMNS = 9
 
+-- Active sorting state
+NovaIsSorted = false
+
 ------------------------------------------------
 -- Main Frame
 ------------------------------------------------
@@ -153,9 +156,13 @@ end
 ------------------------------------------------
 
 function NovaDisplayItems(sorted)
+    if sorted ~= nil then
+        NovaIsSorted = sorted
+    end
+
     NovaScanBags()
 
-    if sorted then
+    if NovaIsSorted then
         table.sort(NovaInventory, function(a, b)
             -- Always push empty slots to the bottom
             if a.hasItem ~= b.hasItem then
@@ -237,6 +244,6 @@ SlashCmdList["NOVA"] = function()
         NovaFrame:Hide()
     else
         NovaFrame:Show()
-        NovaDisplayItems(false)
+        NovaDisplayItems(NovaIsSorted)
     end
 end
