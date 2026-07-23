@@ -1,7 +1,6 @@
 --=============================================================================
 -- NovaBags
 -- File: ItemButton.lua
--- Clean custom item button implementation
 --=============================================================================
 
 NovaItemButtons = {}
@@ -9,7 +8,7 @@ NovaItemButtons = {}
 function NovaCreateItemButton(parent, index)
     local button = CreateFrame("Button", "NovaItemButton" .. index, parent)
     button:SetSize(32, 32)
-    button:SetFrameLevel(parent:GetFrameLevel() + 5)
+    button:SetFrameLevel(parent:GetFrameLevel() + 2)
 
     -- Icon Texture
     local icon = button:CreateTexture(nil, "BORDER")
@@ -41,7 +40,7 @@ function NovaCreateItemButton(parent, index)
         GameTooltip:Hide()
     end)
 
-    -- Right Click to use / Left Click to pickup
+    -- Actions
     button:RegisterForClicks("LeftButtonUp", "RightButtonUp")
     button:SetScript("OnClick", function(self, btn)
         if not self.bagID or not self.slotID then return end
