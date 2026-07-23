@@ -1,74 +1,62 @@
-NovaInventory = {}
+--=============================================================================
+-- NovaBags
+-- File: BagScanner.lua
+--
+-- Scans player bags
+--=============================================================================
 
+NovaInventory = {}
 
 
 function NovaScanBags()
 
-
-NovaInventory={}
-
+    NovaInventory = {}
 
 
-for bag=0,4 do
+    for bag = 0, 4 do
 
 
-
-local slots =
-GetContainerNumSlots(bag)
+        local slots = GetContainerNumSlots(bag)
 
 
-
-for slot=1,slots do
-
+        for slot = 1, slots do
 
 
-local link =
-GetContainerItemLink(
-bag,
-slot
-)
+            local link = GetContainerItemLink(
+                bag,
+                slot
+            )
 
 
-
-if link then
-
+            if link then
 
 
-local _,count =
-GetContainerItemInfo(
-bag,
-slot
-)
+                local texture, count =
+                GetContainerItemInfo(
+                    bag,
+                    slot
+                )
 
 
-
-table.insert(
-NovaInventory,
-{
-
-link=link,
-
-count=count or 1,
-
-bagID=bag,
-
-slotID=slot
-
-}
-)
+                table.insert(
+                    NovaInventory,
+                    {
+                        link = link,
+                        count = count or 1,
+                        bagID = bag,
+                        slotID = slot,
+                        texture = texture
+                    }
+                )
 
 
-
-end
-
+            end
 
 
-end
+        end
 
 
-
-end
-
+    end
 
 
 end
