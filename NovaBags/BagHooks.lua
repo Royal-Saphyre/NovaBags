@@ -2,176 +2,59 @@
 -- NovaBags
 -- File: BagHooks.lua
 --
--- Safely replaces Blizzard bag opening functions
+-- Safely replaces Blizzard bag opening functions and keybindings
 --=============================================================================
 
-
-local NovaOriginal = {}
-
-
-
-------------------------------------------------
--- Save Blizzard functions
-------------------------------------------------
-
-NovaOriginal.ToggleBackpack = ToggleBackpack
-NovaOriginal.OpenBackpack = OpenBackpack
-NovaOriginal.CloseBackpack = CloseBackpack
-NovaOriginal.OpenAllBags = OpenAllBags
-NovaOriginal.CloseAllBags = CloseAllBags
-NovaOriginal.ToggleAllBags = ToggleAllBags
-
-
-
-------------------------------------------------
--- Toggle Nova
-------------------------------------------------
-
-function NovaToggleBags()
-
+local function ToggleNova()
     if NovaFrame:IsShown() then
-
         NovaFrame:Hide()
-
     else
-
         NovaFrame:Show()
-
         NovaDisplayItems()
-
     end
-
 end
-
-
 
 ------------------------------------------------
--- Replace Blizzard bag functions
+-- Global toggle function for bindings
 ------------------------------------------------
-
-function ToggleBackpack()
-
-    NovaToggleBags()
-
-end
-
-
-
-function OpenBackpack()
-
-    if not NovaFrame:IsShown() then
-
-        NovaFrame:Show()
-
-        NovaDisplayItems()
-
-    end
-
-end
-
-
-
-function CloseBackpack()
-
-    NovaFrame:Hide()
-
-end
-
-
-
-function ToggleAllBags()
-
-    NovaToggleBags()
-
-end
-
-
-
-function OpenAllBags()
-
-    if not NovaFrame:IsShown() then
-
-        NovaFrame:Show()
-
-        NovaDisplayItems()
-
-    end
-
-end
-
-
-
-function CloseAllBags()
-
-    NovaFrame:Hide()
-
-end
-
-
+_G["NovaToggleBags"] = ToggleNova
 
 ------------------------------------------------
--- Hide Blizzard container frames
--- only when they appear naturally
+-- Override Blizzard bag toggles
 ------------------------------------------------
+function ToggleBackpack() ToggleNova() end
+function OpenBackpack() NovaFrame:Show() NovaDisplayItems() end
+function CloseBackpack() NovaFrame:Hide() end
+function ToggleAllBags() ToggleNova() end
+function OpenAllBags() NovaFrame:Show() NovaDisplayItems() end
+function CloseAllBags() NovaFrame:Hide() end
 
-local eventFrame =
-CreateFrame(
-"Frame"
-)
-
-
-eventFrame:RegisterEvent(
-"BAG_OPEN"
-)
-
-
-eventFrame:RegisterEvent(
-"PLAYER_LOGIN"
-)
-
-
-
-eventFrame:SetScript(
-"OnEvent",
-function()
-
-
-for i=1, NUM_CONTAINER_FRAMES do
-
-
-    local frame =
-    _G["ContainerFrame"..i]
-
-
-    if frame then
-
-        frame:Hide()
-
-    end
-
-
-end
-
-
-
+-- Intercept microbar bag icon clicks (Bag 0 to 4)
+hooksecurefunc("ToggleBag", function(bagID)
+    ToggleNova()
 end)
 
-
+hooksecurefunc("OpenBag", function(bagID)
+    NovaFrame:Show()
+    NovaDisplayItems()
+end)
 
 ------------------------------------------------
--- Bind B key
+-- Force override standard B and Shift+B keys
 ------------------------------------------------
-
-hooksecurefunc(
-"ToggleBackpack",
-function()
-
-    if NovaFrame then
-
-        NovaFrame:Show()
-
-        NovaDisplayItems()
-
+local f = CreateFrame("Frame")
+f:RegisterEvent("PLAYER_LOGIN")
+f:SetScript("OnEvent", function(self, event)
+    -- Hide default Blizzard container frames if they pop up
+    for i = 1, NUM_CONTAINER_FRAMES do
+        local container = _G["ContainerFrame" .. i]
+        if container then
+            container:UnregisterAllEvents()
+            container:Hide()
+        end
     end
 
+    -- Override standard WoW keybindings to point to NovaBags
+    SetBinding("B", "NOVA")
+    SetBinding("SHIFT-B", "NOVA")
 end)
