@@ -10,31 +10,23 @@ NovaInventory = {}
 
 function NovaScanBags()
 
-    NovaInventory = {}
+
+    wipe(NovaInventory)
+
 
 
     for bag = 0,4 do
 
 
-        local slots =
-        GetContainerNumSlots(bag)
+        local slots = GetContainerNumSlots(bag)
 
 
 
-        for slot = 1,slots do
+        for slot = 1, slots do
 
 
-
-            local texture,count =
+            local texture, count, locked, quality, readable, lootable, link =
             GetContainerItemInfo(
-                bag,
-                slot
-            )
-
-
-
-            local link =
-            GetContainerItemLink(
                 bag,
                 slot
             )
@@ -48,13 +40,13 @@ function NovaScanBags()
                     NovaInventory,
                     {
 
-                        link = link,
-
-                        count = count or 1,
-
                         bagID = bag,
 
                         slotID = slot,
+
+                        link = link,
+
+                        count = count or 1,
 
                         texture = texture
 
@@ -69,6 +61,7 @@ function NovaScanBags()
 
 
     end
+
 
 
 end
