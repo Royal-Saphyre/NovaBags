@@ -10,6 +10,11 @@ function NovaCreateItemButton(parent, index)
     button:SetSize(32, 32)
     button:SetFrameLevel(parent:GetFrameLevel() + 2)
 
+    -- Background texture for empty slots
+    local bg = button:CreateTexture(nil, "BACKGROUND")
+    bg:SetAllPoints(button)
+    bg:SetTexture("Interface\\PaperDoll\\UI-Backpack-EmptySlot")
+
     -- Icon Texture
     local icon = button:CreateTexture(nil, "BORDER")
     icon:SetAllPoints(button)
@@ -29,7 +34,7 @@ function NovaCreateItemButton(parent, index)
 
     -- Tooltips
     button:SetScript("OnEnter", function(self)
-        if self.bagID and self.slotID then
+        if self.bagID and self.slotID and self.link then
             GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
             GameTooltip:SetBagItem(self.bagID, self.slotID)
             GameTooltip:Show()
@@ -40,10 +45,10 @@ function NovaCreateItemButton(parent, index)
         GameTooltip:Hide()
     end)
 
-    -- Actions
+    -- Actions & Drag and Drop
     button:RegisterForClicks("LeftButtonUp", "RightButtonUp")
     button:SetScript("OnClick", function(self, btn)
-        if not self.bagID or not self.slotID then return end
+        if self.bagID == nil or self.slotID == nil then return end
 
         if btn == "RightButton" then
             UseContainerItem(self.bagID, self.slotID)
@@ -54,13 +59,13 @@ function NovaCreateItemButton(parent, index)
 
     button:RegisterForDrag("LeftButton")
     button:SetScript("OnDragStart", function(self)
-        if self.bagID and self.slotID then
+        if self.bagID ~= nil and self.slotID ~= nil then
             PickupContainerItem(self.bagID, self.slotID)
         end
     end)
 
     button:SetScript("OnReceiveDrag", function(self)
-        if self.bagID and self.slotID then
+        if self.bagID ~= nil and self.slotID ~= nil then
             PickupContainerItem(self.bagID, self.slotID)
         end
     end)
