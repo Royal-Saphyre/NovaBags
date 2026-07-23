@@ -18,7 +18,7 @@ function NovaCreateItemButton(parent, index)
     )
 
     -- Size
-    button:SetSize(40, 40)
+    button:SetSize(30, 30)
 
     -- Icon
     button.icon = button:CreateTexture(
@@ -36,14 +36,14 @@ function NovaCreateItemButton(parent, index)
 
     button.count:SetFont(
         "Fonts\\FRIZQT__.TTF",
-        12,
+        10,
         "OUTLINE"
     )
 
     button.count:SetPoint(
         "BOTTOMRIGHT",
-        -2,
-        2
+        -1,
+        1
     )
 
     -- Highlight effect
