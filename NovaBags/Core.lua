@@ -229,7 +229,8 @@ local PER_ROW = 10
 
 function NovaDisplayItems()
 
-for _,item in ipairs(NovaInventory) do
+for _,item in ipairs(NovaInventory) do 
+        print("Nova displaying:", item.link)
 
 NovaScanBags()
 
