@@ -1,24 +1,22 @@
 --=============================================================================
 -- NovaBags
 -- File: ItemButton.lua
---
--- Blizzard-style item buttons
 --=============================================================================
 
 NovaItemButtons = {}
 
 
-local ITEM_SIZE = 30
+local ITEM_SIZE = 32
 
 
-function NovaCreateItemButton(parent, index)
+function NovaCreateItemButton(parent,index)
 
 
-    local button = CreateFrame(
+    local button =
+    CreateFrame(
         "Button",
         "NovaItemButton"..index,
-        parent,
-        "ContainerFrameItemButtonTemplate"
+        parent
     )
 
 
@@ -28,108 +26,132 @@ function NovaCreateItemButton(parent, index)
     )
 
 
-    button:SetID(index)
+    button:RegisterForClicks(
+        "LeftButtonUp",
+        "RightButtonUp"
+    )
 
 
 
-    ------------------------------------------------
-    -- Count text
-    ------------------------------------------------
-
-    if not button.Count then
-
-
-        button.Count =
-        button:CreateFontString(
-            nil,
-            "OVERLAY"
-        )
+    button.icon =
+    button:CreateTexture(
+        nil,
+        "BACKGROUND"
+    )
 
 
-        button.Count:SetFont(
-            "Fonts\\FRIZQT__.TTF",
-            10,
-            "OUTLINE"
-        )
-
-
-        button.Count:SetPoint(
-            "BOTTOMRIGHT",
-            -2,
-            2
-        )
-
-
-    end
+    button.icon:SetAllPoints()
 
 
 
-    ------------------------------------------------
-    -- Tooltip
-    ------------------------------------------------
-
-    button:SetScript(
-        "OnEnter",
-        function(self)
+    button.count =
+    button:CreateFontString(
+        nil,
+        "OVERLAY"
+    )
 
 
-            if self.link then
+    button.count:SetFont(
+        "Fonts\\FRIZQT__.TTF",
+        10,
+        "OUTLINE"
+    )
 
 
-                GameTooltip:SetOwner(
-                    self,
-                    "ANCHOR_RIGHT"
-                )
+    button.count:SetPoint(
+        "BOTTOMRIGHT",
+        -2,
+        2
+    )
 
 
-                GameTooltip:SetHyperlink(
-                    self.link
-                )
 
-
-                GameTooltip:Show()
-
-
-            end
-
-
-        end
+    button:SetHighlightTexture(
+        "Interface\\Buttons\\ButtonHilight-Square"
     )
 
 
 
     button:SetScript(
-        "OnLeave",
-        function()
+    "OnEnter",
+    function(self)
+
+        if self.link then
+
+            GameTooltip:SetOwner(
+                self,
+                "ANCHOR_RIGHT"
+            )
+
+            GameTooltip:SetHyperlink(
+                self.link
+            )
+
+            GameTooltip:Show()
+
+        end
+
+    end)
 
 
-            GameTooltip:Hide()
+
+    button:SetScript(
+    "OnLeave",
+    function()
+
+        GameTooltip:Hide()
+
+    end)
+
+
+
+    button:SetScript(
+    "OnClick",
+    function(self,click)
+
+
+        if not self.bagID then
+            return
+        end
+
+
+
+        if click=="LeftButton" then
+
+
+            PickupContainerItem(
+                self.bagID,
+                self.slotID
+            )
+
+
+        elseif click=="RightButton" then
+
+
+            UseContainerItem(
+                self.bagID,
+                self.slotID
+            )
 
 
         end
-    )
+
+
+    end)
 
 
 
-    ------------------------------------------------
-    -- Save reference
-    ------------------------------------------------
-
-    NovaItemButtons[index] = button
+    NovaItemButtons[index]=button
 
 
     return button
-
 
 end
 
 
 
-------------------------------------------------
--- Update item data
-------------------------------------------------
 
-function NovaUpdateItemButton(button, item)
+function NovaUpdateItemButton(button,item)
 
 
     button.bagID =
@@ -140,43 +162,20 @@ function NovaUpdateItemButton(button, item)
     item.slotID
 
 
-
     button.link =
     item.link
 
 
 
-    -- Required by Blizzard container buttons
-
-    button:SetID(
-        item.slotID
+    button.icon:SetTexture(
+        item.texture or
+        "Interface\\Icons\\INV_Misc_QuestionMark"
     )
 
 
-
-    if button.icon then
-
-
-        button.icon:SetTexture(
-            item.texture or
-            "Interface\\Icons\\INV_Misc_QuestionMark"
-        )
-
-
-    end
-
-
-
-    if button.Count then
-
-
-        button.Count:SetText(
-            item.count or 1
-        )
-
-
-    end
-
+    button.count:SetText(
+        item.count or 1
+    )
 
 
     button:Show()
