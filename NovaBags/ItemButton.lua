@@ -11,24 +11,24 @@ function NovaCreateItemButton(parent, index)
     button:SetSize(32, 32)
     button:SetFrameLevel(parent:GetFrameLevel() + 5)
 
-    -- Icon texture
+    -- Icon Texture
     local icon = button:CreateTexture(nil, "BORDER")
     icon:SetAllPoints(button)
     button.icon = icon
 
-    -- Stack Count text
+    -- Stack Count
     local count = button:CreateFontString(nil, "OVERLAY", "NumberFontNormal")
     count:SetPoint("BOTTOMRIGHT", button, "BOTTOMRIGHT", -2, 2)
     count:SetJustifyH("RIGHT")
     button.count = count
 
-    -- Mouseover highlight texture
+    -- Mouseover Highlight
     local hl = button:CreateTexture(nil, "HIGHLIGHT")
     hl:SetTexture("Interface\\Buttons\\ButtonHilight-Square")
     hl:SetAllPoints(button)
     button:SetHighlightTexture(hl)
 
-    -- Tooltip handlers
+    -- Tooltips
     button:SetScript("OnEnter", function(self)
         if self.bagID and self.slotID then
             GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
@@ -41,7 +41,7 @@ function NovaCreateItemButton(parent, index)
         GameTooltip:Hide()
     end)
 
-    -- Click & Drag interaction
+    -- Right Click to use / Left Click to pickup
     button:RegisterForClicks("LeftButtonUp", "RightButtonUp")
     button:SetScript("OnClick", function(self, btn)
         if not self.bagID or not self.slotID then return end
