@@ -5,9 +5,68 @@
 -- Creates the main Nova window
 --=============================================================================
 
-NovaFrame = CreateFrame("Frame", "NovaMainFrame", UIParent)
+print("Core.lua loaded")
+print("NovaItemButtons =", NovaItemButtons)
+print("NovaCreateItemButton =", NovaCreateItemButton)
+
+
 ---------------------------------------------------
--- Nova Header / Logo
+-- Main Window
+---------------------------------------------------
+
+NovaFrame = CreateFrame(
+    "Frame",
+    "NovaMainFrame",
+    UIParent
+)
+
+NovaFrame:SetSize(600, 450)
+NovaFrame:SetPoint("CENTER")
+
+
+NovaFrame:SetBackdrop({
+    bgFile = "Interface\\DialogFrame\\UI-DialogBox-Background",
+    edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
+    edgeSize = 24,
+    insets = {
+        left = 8,
+        right = 8,
+        top = 8,
+        bottom = 8
+    }
+})
+
+
+NovaFrame:SetMovable(true)
+NovaFrame:EnableMouse(true)
+
+NovaFrame:RegisterForDrag(
+    "LeftButton"
+)
+
+
+NovaFrame:SetScript(
+    "OnDragStart",
+    function(self)
+        self:StartMoving()
+    end
+)
+
+
+NovaFrame:SetScript(
+    "OnDragStop",
+    function(self)
+        self:StopMovingOrSizing()
+    end
+)
+
+
+NovaFrame:Hide()
+
+
+
+---------------------------------------------------
+-- Nova Header
 ---------------------------------------------------
 
 local header = CreateFrame(
@@ -16,7 +75,11 @@ local header = CreateFrame(
     NovaFrame
 )
 
-header:SetSize(600, 70)
+header:SetSize(
+    600,
+    70
+)
+
 header:SetPoint(
     "TOP",
     NovaFrame,
@@ -26,37 +89,46 @@ header:SetPoint(
 )
 
 
--- Starburst logo
+
+-- Starburst Logo
 
 local logo = header:CreateTexture(
     nil,
     "ARTWORK"
 )
 
-logo:SetSize(55, 55)
+logo:SetSize(
+    55,
+    55
+)
+
 logo:SetPoint(
     "LEFT",
     25,
     0
 )
 
+
 logo:SetTexture(
     "Interface\\Icons\\Spell_Shadow_Twilight"
 )
 
 
--- Nova title
+
+-- NovaBags Title
 
 local title = header:CreateFontString(
     nil,
     "OVERLAY"
 )
 
+
 title:SetFont(
     "Fonts\\FRIZQT__.TTF",
     28,
     "OUTLINE"
 )
+
 
 title:SetPoint(
     "LEFT",
@@ -66,46 +138,16 @@ title:SetPoint(
     0
 )
 
+
 title:SetText(
     "|cff00ccffNova|rBags"
 )
-NovaFrame:SetSize(600, 450)
-NovaFrame:SetPoint("CENTER")
-
-NovaFrame:SetBackdrop({
-    bgFile = "Interface\\DialogFrame\\UI-DialogBox-Background",
-    edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
-    edgeSize = 16,
-    insets = {
-        left = 5,
-        right = 5,
-        top = 5,
-        bottom = 5
-    }
-})
-
-
-NovaFrame:SetMovable(true)
-NovaFrame:EnableMouse(true)
-
-NovaFrame:RegisterForDrag("LeftButton")
-
-
-NovaFrame:SetScript("OnDragStart", function(self)
-    self:StartMoving()
-end)
-
-
-NovaFrame:SetScript("OnDragStop", function(self)
-    self:StopMovingOrSizing()
-end)
-
-
-NovaFrame:Hide()
 
 
 
--- Close button
+---------------------------------------------------
+-- Close Button
+---------------------------------------------------
 
 local close = CreateFrame(
     "Button",
@@ -114,12 +156,19 @@ local close = CreateFrame(
     "UIPanelCloseButton"
 )
 
-close:SetPoint("TOPRIGHT", -5, -5)
+close:SetPoint(
+    "TOPRIGHT",
+    -5,
+    -5
+)
 
 
-close:SetScript("OnClick", function()
-    NovaFrame:Hide()
-end)
+close:SetScript(
+    "OnClick",
+    function()
+        NovaFrame:Hide()
+    end
+)
 
 
 
@@ -132,7 +181,9 @@ function NovaDisplayItems()
     NovaScanBags()
 
 
-    print("|cffd4af37Nova|r displaying "..#NovaInventory.." items")
+    print(
+        "|cffd4af37Nova|r displaying "..#NovaInventory.." items"
+    )
 
 
     for i, item in ipairs(NovaInventory) do
@@ -155,7 +206,7 @@ function NovaDisplayItems()
         button:SetPoint(
             "TOPLEFT",
             30 + ((i-1)%10)*45,
-            -60 - math.floor((i-1)/10)*45
+            -80 - math.floor((i-1)/10)*45
         )
 
 
@@ -165,7 +216,9 @@ function NovaDisplayItems()
 
 
 
-        button.icon:SetTexture(icon)
+        button.icon:SetTexture(
+            icon
+        )
 
 
         button.count:SetText(
