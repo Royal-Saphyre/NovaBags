@@ -1,8 +1,6 @@
 --=============================================================================
 -- NovaBags
 -- File: ItemButton.lua
---
--- Creates item buttons
 --=============================================================================
 
 NovaItemButtons = {}
@@ -24,10 +22,15 @@ function NovaCreateItemButton(parent, index)
     )
 
 
-    button.icon =
-    button:CreateTexture(
+    button:SetFrameLevel(
+        parent:GetFrameLevel() + 5
+    )
+
+
+
+    button.icon = button:CreateTexture(
         nil,
-        "BACKGROUND"
+        "ARTWORK"
     )
 
 
@@ -35,8 +38,7 @@ function NovaCreateItemButton(parent, index)
 
 
 
-    button.count =
-    button:CreateFontString(
+    button.count = button:CreateFontString(
         nil,
         "OVERLAY"
     )
@@ -80,9 +82,7 @@ function NovaCreateItemButton(parent, index)
             end
 
 
-
             if mouse == "LeftButton" then
-
 
                 PickupContainerItem(
                     self.bagID,
@@ -92,12 +92,10 @@ function NovaCreateItemButton(parent, index)
 
             elseif mouse == "RightButton" then
 
-
                 UseContainerItem(
                     self.bagID,
                     self.slotID
                 )
-
 
             end
 
@@ -111,26 +109,20 @@ function NovaCreateItemButton(parent, index)
         "OnEnter",
         function(self)
 
-
             if self.link then
-
 
                 GameTooltip:SetOwner(
                     self,
                     "ANCHOR_RIGHT"
                 )
 
-
                 GameTooltip:SetHyperlink(
                     self.link
                 )
 
-
                 GameTooltip:Show()
 
-
             end
-
 
         end
     )
@@ -152,6 +144,5 @@ function NovaCreateItemButton(parent, index)
 
 
     return button
-
 
 end
