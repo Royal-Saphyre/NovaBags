@@ -1,70 +1,49 @@
 --=============================================================================
 -- NovaBags
 -- File: Core.lua
---
--- Main NovaBags window
 --=============================================================================
 
 
----------------------------------------------------
--- Theme Settings
----------------------------------------------------
-
-NovaTheme = {
-
-    HeaderColor = {
-        r = 1,
-        g = 1,
-        b = 1,
-        a = 1
-    }
-
-}
-
-
-
----------------------------------------------------
--- Main Frame
----------------------------------------------------
-
-NovaFrame = CreateFrame(
-    "Frame",
-    "NovaMainFrame",
-    UIParent
+NovaFrame =
+CreateFrame(
+"Frame",
+"NovaMainFrame",
+UIParent
 )
+
 
 
 NovaFrame:SetSize(
-    360,
-    420
+380,
+420
 )
 
 
+
 NovaFrame:SetPoint(
-    "RIGHT",
-    UIParent,
-    "RIGHT",
-    -40,
-    0
+"RIGHT",
+UIParent,
+"RIGHT",
+-40,
+0
 )
 
 
 
 NovaFrame:SetBackdrop({
 
-    bgFile = "Interface\\DialogFrame\\UI-DialogBox-Background",
+bgFile="Interface\\DialogFrame\\UI-DialogBox-Background",
 
-    edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
+edgeFile="Interface\\Tooltips\\UI-Tooltip-Border",
 
-    edgeSize = 16,
+edgeSize=16,
 
-    insets =
-    {
-        left = 5,
-        right = 5,
-        top = 5,
-        bottom = 5
-    }
+insets={
+left=5,
+right=5,
+top=5,
+bottom=5
+}
 
 })
 
@@ -75,7 +54,7 @@ NovaFrame:SetMovable(true)
 NovaFrame:EnableMouse(true)
 
 NovaFrame:RegisterForDrag(
-    "LeftButton"
+"LeftButton"
 )
 
 
@@ -84,7 +63,7 @@ NovaFrame:SetScript(
 "OnDragStart",
 function(self)
 
-    self:StartMoving()
+self:StartMoving()
 
 end)
 
@@ -94,7 +73,7 @@ NovaFrame:SetScript(
 "OnDragStop",
 function(self)
 
-    self:StopMovingOrSizing()
+self:StopMovingOrSizing()
 
 end)
 
@@ -105,7 +84,7 @@ NovaFrame:Hide()
 
 
 ---------------------------------------------------
--- Metallic Header
+-- Header
 ---------------------------------------------------
 
 local header =
@@ -128,19 +107,8 @@ header:SetSize(
 
 header:SetPoint(
 "TOP",
-NovaFrame,
-"TOP",
 0,
 12
-)
-
-
-
-header:SetVertexColor(
-NovaTheme.HeaderColor.r,
-NovaTheme.HeaderColor.g,
-NovaTheme.HeaderColor.b,
-NovaTheme.HeaderColor.a
 )
 
 
@@ -155,8 +123,6 @@ nil,
 
 title:SetPoint(
 "TOP",
-header,
-"TOP",
 0,
 -14
 )
@@ -169,41 +135,10 @@ title:SetText(
 
 
 ---------------------------------------------------
--- Close Button
----------------------------------------------------
-
-local close =
-CreateFrame(
-"Button",
-nil,
-NovaFrame,
-"UIPanelCloseButton"
-)
-
-
-close:SetPoint(
-"TOPRIGHT",
--3,
--6
-)
-
-
-
-close:SetScript(
-"OnClick",
-function()
-
-    NovaFrame:Hide()
-
-end)
-
-
-
----------------------------------------------------
 -- Scan Button
 ---------------------------------------------------
 
-local scanButton =
+local scan =
 CreateFrame(
 "Button",
 nil,
@@ -212,39 +147,40 @@ NovaFrame,
 )
 
 
-scanButton:SetSize(
+
+scan:SetSize(
 90,
 22
 )
 
 
-scanButton:SetPoint(
+scan:SetPoint(
 "TOPLEFT",
 15,
 -35
 )
 
 
-scanButton:SetText(
-"Scan Bags"
+scan:SetText(
+"Scan"
 )
 
 
 
-scanButton:SetScript(
+scan:SetScript(
 "OnClick",
 function()
 
-    NovaScanBags()
+NovaScanBags()
 
-    NovaDisplayItems()
+NovaDisplayItems()
 
 end)
 
 
 
 ---------------------------------------------------
--- Item Container
+-- Slot Holder
 ---------------------------------------------------
 
 local holder =
@@ -263,113 +199,105 @@ holder:SetPoint(
 
 
 
-local GAP = 34
+local SIZE = 38
 
-local PER_ROW = 10
+local PERROW = 9
 
 
 
 ---------------------------------------------------
--- Display Items
+-- Display
 ---------------------------------------------------
 
 function NovaDisplayItems()
 
 
-    local index = 1
+
+local index=1
 
 
 
-    for _,item in ipairs(NovaInventory) do
+for _,item in ipairs(NovaInventory) do
 
 
 
-        local button =
-        NovaItemButtons[index]
+local button =
+NovaItemButtons[index]
 
 
 
-        if not button then
+if not button then
 
 
-            button =
-            NovaCreateItemButton(
-                holder,
-                index
-            )
+button =
+NovaCreateItemButton(
+holder,
+index
+)
 
 
-        end
-
-
-
-        button:SetPoint(
-            "TOPLEFT",
-            ((index-1)%PER_ROW)*GAP,
-            -math.floor((index-1)/PER_ROW)*GAP
-        )
+end
 
 
 
-        button.bagID =
-        item.bagID
+button:SetPoint(
+"TOPLEFT",
+((index-1)%PERROW)*SIZE,
+-math.floor((index-1)/PERROW)*SIZE
+)
 
 
 
-        button.slotID =
-        item.slotID
+button.bagID=item.bagID
+
+button.slotID=item.slotID
+
+button.link=item.link
 
 
 
-        button.link =
-        item.link
+button.icon:SetTexture(
+item.texture
+or
+"Interface\\Icons\\INV_Misc_QuestionMark"
+)
 
 
 
-        button.icon:SetTexture(
-            item.texture
-            or
-            "Interface\\Icons\\INV_Misc_QuestionMark"
-        )
+if item.count>1 then
+
+button.count:SetText(
+item.count
+)
+
+else
+
+button.count:SetText(
+""
+)
+
+end
 
 
 
-        if item.count and item.count > 1 then
-
-
-            button.count:SetText(
-                item.count
-            )
-
-
-        else
-
-
-            button.count:SetText(
-                ""
-            )
-
-
-        end
+button:Show()
 
 
 
-        button:Show()
+index=index+1
 
 
 
-        index = index + 1
-
-
-    end
+end
 
 
 
-    for i=index,#NovaItemButtons do
+for i=index,#NovaItemButtons do
 
-        NovaItemButtons[i]:Hide()
+NovaItemButtons[i]:Hide()
 
-    end
+end
+
 
 
 end
@@ -377,29 +305,27 @@ end
 
 
 ---------------------------------------------------
--- Toggle Nova
+-- Open / Close
 ---------------------------------------------------
 
 function NovaToggle()
 
 
-    if NovaFrame:IsShown() then
 
+if NovaFrame:IsShown() then
 
-        NovaFrame:Hide()
+NovaFrame:Hide()
 
+else
 
-    else
+NovaFrame:Show()
 
+NovaScanBags()
 
-        NovaFrame:Show()
+NovaDisplayItems()
 
-        NovaScanBags()
+end
 
-        NovaDisplayItems()
-
-
-    end
 
 
 end
@@ -407,84 +333,47 @@ end
 
 
 ---------------------------------------------------
--- Replace Blizzard Bag Opening
+-- Safe Blizzard replacements
 ---------------------------------------------------
 
 function ToggleBackpack()
 
-    NovaToggle()
+NovaToggle()
 
 end
-
 
 
 function OpenBackpack()
 
-    NovaToggle()
+NovaToggle()
 
 end
-
 
 
 function OpenAllBags()
 
-    NovaToggle()
+NovaToggle()
 
 end
-
 
 
 function ToggleAllBags()
 
-    NovaToggle()
+NovaToggle()
 
 end
 
 
 
 ---------------------------------------------------
--- Refresh when bags change
+-- Slash
 ---------------------------------------------------
 
-local update =
-CreateFrame("Frame")
+SLASH_NOVA1="/nova"
 
 
-update:RegisterEvent(
-"BAG_UPDATE"
-)
+SlashCmdList["NOVA"]=function()
 
-
-
-update:SetScript(
-"OnEvent",
-function()
-
-
-    if NovaFrame:IsShown() then
-
-        NovaScanBags()
-
-        NovaDisplayItems()
-
-    end
-
-
-end)
-
-
-
----------------------------------------------------
--- Slash Command
----------------------------------------------------
-
-SLASH_NOVA1 = "/nova"
-
-
-
-SlashCmdList["NOVA"] =
-function()
-
-    NovaToggle()
+NovaToggle()
 
 end
