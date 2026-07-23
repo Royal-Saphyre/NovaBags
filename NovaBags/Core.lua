@@ -4,14 +4,14 @@
 --=============================================================================
 
 local SPACING = 36
-local COLUMNS = 10
+local COLUMNS = 9
 
 ------------------------------------------------
 -- Main Frame
 ------------------------------------------------
 
 NovaFrame = CreateFrame("Frame", "NovaMainFrame", UIParent)
-NovaFrame:SetSize(400, 480)
+NovaFrame:SetSize(370, 420)
 NovaFrame:SetPoint("CENTER", UIParent, "CENTER", 0, 0)
 
 NovaFrame:SetBackdrop({
@@ -39,18 +39,18 @@ NovaFrame:Hide()
 
 local header = NovaFrame:CreateTexture(nil, "ARTWORK")
 header:SetTexture("Interface\\DialogFrame\\UI-DialogBox-Header")
-header:SetSize(300, 64)
-header:SetPoint("TOP", 0, 12)
+header:SetSize(260, 50)
+header:SetPoint("TOP", 0, 10)
 NovaHeader = header
 
 local logo = NovaFrame:CreateTexture(nil, "OVERLAY")
 logo:SetTexture("Interface\\Icons\\INV_Misc_Orb_05")
-logo:SetSize(38, 38)
-logo:SetPoint("LEFT", header, "LEFT", 35, 0)
+logo:SetSize(32, 32)
+logo:SetPoint("LEFT", header, "LEFT", 25, 0)
 NovaLogo = logo
 
-local title = NovaFrame:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
-title:SetPoint("CENTER", header, "CENTER", 0, 9)
+local title = NovaFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+title:SetPoint("CENTER", header, "CENTER", 0, 8)
 title:SetText("NovaBags")
 
 ------------------------------------------------
@@ -62,15 +62,40 @@ close:SetPoint("TOPRIGHT", -5, -5)
 close:SetScript("OnClick", function() NovaFrame:Hide() end)
 
 ------------------------------------------------
--- Themes
+-- Scroll Container & Child Content Frame
+------------------------------------------------
+
+local scrollFrame = CreateFrame("ScrollFrame", "NovaBagScrollFrame", NovaFrame, "UIPanelScrollFrameTemplate")
+scrollFrame:SetPoint("TOPLEFT", NovaFrame, "TOPLEFT", 15, -45)
+scrollFrame:SetPoint("BOTTOMRIGHT", NovaFrame, "BOTTOMRIGHT", -35, 45)
+
+local scrollChild = CreateFrame("Frame", "NovaBagScrollChild", scrollFrame)
+scrollChild:SetSize(320, 1) -- Height updates dynamically in NovaCreateSlots
+scrollFrame:SetScrollChild(scrollChild)
+
+-- Enable Mousewheel Scrolling
+scrollFrame:EnableMouseWheel(true)
+scrollFrame:SetScript("OnMouseWheel", function(self, delta)
+    local current = self:GetVerticalScroll()
+    local maxScroll = self:GetVerticalScrollRange()
+    local newScroll = current - (delta * 30)
+
+    if newScroll < 0 then newScroll = 0 end
+    if newScroll > maxScroll then newScroll = maxScroll end
+
+    self:SetVerticalScroll(newScroll)
+end)
+
+------------------------------------------------
+-- Themes (Relocated cleanly to footer)
 ------------------------------------------------
 
 NovaThemes = {
-    Default = { 0.1, 0.1, 0.1, 0.7, 0.7, 0.7, "Interface\\Icons\\INV_Misc_QuestionMark" },
+    Default     = { 0.10, 0.10, 0.10, 0.70, 0.70, 0.70, "Interface\\Icons\\INV_Misc_QuestionMark" },
     ObsidianGold = { 0.02, 0.02, 0.02, 0.85, 0.65, 0.15, "Interface\\Icons\\INV_Ingot_05" },
-    Shadow = { 0.04, 0.03, 0.06, 0.5, 0.2, 0.8, "Interface\\Icons\\Spell_Shadow_Shadesofdark" },
-    Arcane = { 0.08, 0.02, 0.15, 0.5, 0.3, 1, "Interface\\Icons\\Spell_Arcane_Arcane01" },
-    Nature = { 0.02, 0.12, 0.04, 0.3, 0.8, 0.3, "Interface\\Icons\\Spell_Nature_NatureBlessing" }
+    Shadow      = { 0.04, 0.03, 0.06, 0.50, 0.20, 0.80, "Interface\\Icons\\Spell_Shadow_Shadesofdark" },
+    Arcane      = { 0.08, 0.02, 0.15, 0.50, 0.30, 1.00, "Interface\\Icons\\Spell_Arcane_Arcane01" },
+    Starfire    = { 0.02, 0.08, 0.18, 0.20, 0.60, 1.00, "Interface\\Icons\\Spell_Arcane_StarFire" }
 }
 
 function NovaApplyTheme(name)
@@ -82,12 +107,17 @@ function NovaApplyTheme(name)
     NovaHeader:SetVertexColor(t[4], t[5], t[6], 1)
 end
 
-local themeOrder = { "Default", "ObsidianGold", "Shadow", "Arcane", "Nature" }
+local themeOrder = { "Default", "ObsidianGold", "Shadow", "Arcane", "Starfire" }
+
+-- Footer Panel for Theme Selectors
+local themeFooterLabel = NovaFrame:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+themeFooterLabel:SetPoint("BOTTOMLEFT", 15, 16)
+themeFooterLabel:SetText("Themes:")
 
 for i, name in ipairs(themeOrder) do
     local b = CreateFrame("Button", nil, NovaFrame)
-    b:SetSize(22, 22)
-    b:SetPoint("TOPRIGHT", -15 - (i * 25), -15)
+    b:SetSize(20, 20)
+    b:SetPoint("BOTTOMLEFT", 60 + ((i - 1) * 24), 12)
     b:SetNormalTexture(NovaThemes[name][7])
     b:SetScript("OnClick", function() NovaApplyTheme(name) end)
 end
@@ -95,27 +125,30 @@ end
 NovaApplyTheme("ObsidianGold")
 
 ------------------------------------------------
--- Slots Creation
+-- Slots Creation & Dynamic Scroll Height
 ------------------------------------------------
 
 NovaSlots = {}
 
 function NovaCreateSlots(amount)
     for i = #NovaSlots + 1, amount do
-        local button = NovaCreateItemButton(NovaFrame, i)
+        local button = NovaCreateItemButton(scrollChild, i)
 
-        -- Properly padded Grid Calculation anchored inside NovaFrame
         local col = (i - 1) % COLUMNS
         local row = math.floor((i - 1) / COLUMNS)
 
-        local xPos = 20 + (col * SPACING)
-        local yPos = -55 - (row * SPACING)
+        local xPos = (col * SPACING)
+        local yPos = -(row * SPACING)
 
         button:ClearAllPoints()
-        button:SetPoint("TOPLEFT", NovaFrame, "TOPLEFT", xPos, yPos)
+        button:SetPoint("TOPLEFT", scrollChild, "TOPLEFT", xPos, yPos)
 
         NovaSlots[i] = button
     end
+
+    -- Update Scroll Child Height based on calculated rows
+    local totalRows = math.ceil(amount / COLUMNS)
+    scrollChild:SetHeight(math.max(totalRows * SPACING, 10))
 end
 
 ------------------------------------------------
@@ -152,12 +185,12 @@ function NovaDisplayItems()
 end
 
 ------------------------------------------------
--- Scan button
+-- Footer Scan Button
 ------------------------------------------------
 
 local scan = CreateFrame("Button", nil, NovaFrame, "UIPanelButtonTemplate")
-scan:SetSize(80, 22)
-scan:SetPoint("BOTTOM", 0, 10)
+scan:SetSize(60, 20)
+scan:SetPoint("BOTTOMRIGHT", -15, 12)
 scan:SetText("Scan")
 scan:SetScript("OnClick", NovaDisplayItems)
 
